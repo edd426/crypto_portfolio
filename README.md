@@ -1,37 +1,58 @@
 # Crypto Portfolio Analyzer
 
-A web-based cryptocurrency portfolio analyzer that helps users rebalance their holdings according to market capitalization of the top 15 cryptocurrencies.
+**Status**: ✅ FULLY FUNCTIONAL MVP  
+**Last Updated**: May 31, 2025
+
+A web-based cryptocurrency portfolio analyzer that helps users rebalance their holdings according to market capitalization of the top 15 cryptocurrencies, with real-time data from CoinGecko API.
+
+## 🎯 Live Demo
+
+Try it locally in 30 seconds:
+```bash
+git clone <this-repo>
+cd crypto_portfolio
+./start-dev.sh
+```
+Then visit: http://localhost:4200
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
-- No additional dependencies required (uses CoinGecko free API)
+- No API keys required (uses CoinGecko free tier)
 
-### Running the Application
-
-**Option 1: Use the startup script**
+### Option 1: One-Command Start (Recommended)
 ```bash
 ./start-dev.sh
 ```
+This script automatically:
+- Installs dependencies for both frontend and backend
+- Starts both servers with proper cleanup
+- Provides colored status updates
 
-**Option 2: Manual startup**
+### Option 2: Manual Startup
 ```bash
-# Terminal 1 - Backend
-cd backend
-npm install
-npm start
+# Install dependencies
+npm run install:all
 
-# Terminal 2 - Frontend  
-cd frontend
-npm install
-npx ng serve
+# Terminal 1 - Backend (Express.js)
+cd backend && npm start
+
+# Terminal 2 - Frontend (Angular)  
+cd frontend && npm start
 ```
 
 ### Access the Application
-- **Frontend**: http://localhost:4200
+- **Frontend UI**: http://localhost:4200
 - **Backend API**: http://localhost:3001
-- **API Health**: http://localhost:3001/api/v1/health
+- **Health Check**: http://localhost:3001/api/v1/health
+
+### Test the App
+Try this sample portfolio:
+- **BTC**: 0.5 coins
+- **ETH**: 7 coins  
+- **Cash**: $800
+- Click "Calculate Rebalancing" to see live recommendations!
 
 ### Stopping the Application
 
