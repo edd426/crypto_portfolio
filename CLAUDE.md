@@ -101,6 +101,29 @@ Use these CLI tools for optimal development workflow:
 
 Install: `npm install -g @angular/cli prettier && brew install httpie jq`
 
+## Testing Framework
+
+Comprehensive testing setup with Jest for both frontend and backend:
+
+- **Backend**: Jest + Supertest + Nock for API mocking
+- **Frontend**: Jest + Angular Testing Library + Jest-DOM
+- **Coverage**: 70% threshold for all projects
+- **CI/CD**: GitHub Actions with automated testing
+
+### Running Tests
+```bash
+npm test                    # Run all tests
+npm run test:watch          # Watch mode  
+npm run test:coverage       # With coverage reports
+./test-all.sh              # Full test suite with colored output
+```
+
+### Test Structure
+- Unit tests: `src/__tests__/unit/`
+- Integration tests: `src/__tests__/integration/`
+- Component tests: `src/app/components/__tests__/`
+- Service tests: `src/app/services/__tests__/`
+
 ## Development Guidelines
 
 - Use TypeScript strict mode

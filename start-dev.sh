@@ -22,11 +22,14 @@ cd frontend && npm install && cd ..
 
 echo ""
 echo "🔧 Starting backend server (http://localhost:3001)..."
-cd backend && npm start &
+(cd backend && npm start) &
 BACKEND_PID=$!
 
 echo "🎨 Starting frontend server (http://localhost:4200)..."
-cd frontend && npx ng serve &
+# Disable Angular CLI prompts and analytics
+export NG_CLI_ANALYTICS=false
+export CI=true
+(cd frontend && npm start) &
 FRONTEND_PID=$!
 
 echo ""
@@ -39,6 +42,32 @@ echo ""
 echo "Press Ctrl+C to stop both servers"
 echo ""
 
-# Wait for Ctrl+C
-trap 'echo "Stopping servers..."; kill $BACKEND_PID $FRONTEND_PID; exit' INT
+# Function to cleanup processes
+cleanup() {
+    echo ""
+    echo "Stopping servers..."
+    
+    # Kill backend process
+    if kill -0 $BACKEND_PID 2>/dev/null; then
+        kill $BACKEND_PID
+        echo "Backend server stopped"
+    fi
+    
+    # Kill frontend process
+    if kill -0 $FRONTEND_PID 2>/dev/null; then
+        kill $FRONTEND_PID
+        echo "Frontend server stopped"
+    fi
+    
+    # Also kill any remaining processes by name
+    pkill -f "ts-node-dev" 2>/dev/null || true
+    pkill -f "ng serve" 2>/dev/null || true
+    
+    exit 0
+}
+
+# Set trap for cleanup
+trap cleanup INT
+
+# Wait for processes
 wait

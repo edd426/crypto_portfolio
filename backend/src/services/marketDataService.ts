@@ -2,14 +2,13 @@ import axios from 'axios';
 import NodeCache from 'node-cache';
 import { Coin } from '../models/types';
 
-const cache = new NodeCache({ stdTTL: 300 }); // 5 minutes cache
-
 export class MarketDataService {
   private baseURL = 'https://api.coingecko.com/api/v3';
+  private cache = new NodeCache({ stdTTL: 300 }); // 5 minutes cache
   
   async getTopCoins(limit: number = 15, exclude: string[] = []): Promise<Coin[]> {
     const cacheKey = `top-coins-${limit}-${exclude.join(',')}`;
-    const cached = cache.get<Coin[]>(cacheKey);
+    const cached = this.cache.get<Coin[]>(cacheKey);
     
     if (cached) {
       return cached;
@@ -40,7 +39,7 @@ export class MarketDataService {
           volume24h: coin.total_volume
         }));
 
-      cache.set(cacheKey, coins);
+      this.cache.set(cacheKey, coins);
       return coins;
     } catch (error) {
       console.error('Error fetching top coins:', error);
@@ -50,7 +49,7 @@ export class MarketDataService {
 
   async getCoinPrices(symbols: string[]): Promise<Record<string, { price: number; timestamp: string }>> {
     const cacheKey = `prices-${symbols.sort().join(',')}`;
-    const cached = cache.get<Record<string, { price: number; timestamp: string }>>(cacheKey);
+    const cached = this.cache.get<Record<string, { price: number; timestamp: string }>>(cacheKey);
     
     if (cached) {
       return cached;
@@ -98,7 +97,7 @@ export class MarketDataService {
         }
       });
 
-      cache.set(cacheKey, prices);
+      this.cache.set(cacheKey, prices);
       return prices;
     } catch (error) {
       console.error('Error fetching coin prices:', error);

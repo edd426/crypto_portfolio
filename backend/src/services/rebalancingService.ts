@@ -1,5 +1,5 @@
 import { MarketDataService } from './marketDataService';
-import { Portfolio, TradeRecommendation, RebalanceResponse, Coin } from '../models/types';
+import { Portfolio, TradeRecommendation, RebalanceResponse } from '../models/types';
 
 export class RebalancingService {
   private marketDataService = new MarketDataService();
