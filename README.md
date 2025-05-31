@@ -33,6 +33,25 @@ npx ng serve
 - **Backend API**: http://localhost:3001
 - **API Health**: http://localhost:3001/api/v1/health
 
+### Stopping the Application
+
+**If using startup script:**
+- Press `Ctrl+C` in the terminal where `./start-dev.sh` is running
+
+**Manual shutdown:**
+```bash
+# Stop all Node.js processes (frontend + backend)
+pkill -f "node"
+
+# Or stop specific processes
+pkill -f "ng serve"     # Stop frontend
+pkill -f "ts-node-dev"  # Stop backend
+
+# Check if ports are free
+lsof -i :3001  # Backend port
+lsof -i :4200  # Frontend port
+```
+
 ## 📊 Features
 
 ### Phase 1 (Current MVP)
