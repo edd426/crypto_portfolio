@@ -1,0 +1,36 @@
+{
+  "name": "crypto-portfolio-analyzer",
+  "version": "1.0.0",
+  "description": "A crypto portfolio rebalancing and backtesting application",
+  "scripts": {
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/crypto_portfolio.git"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "portfolio",
+    "rebalancing",
+    "backtesting",
+    "angular",
+    "typescript"
+  ],
+  "author": "Evan DeLord",
+  "license": "MIT"
+}

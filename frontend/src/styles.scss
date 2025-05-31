@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-2 { margin-top: 16px; }
+.mb-2 { margin-bottom: 16px; }
+.mr-2 { margin-right: 16px; }
+.ml-2 { margin-left: 16px; }
+
+.card {
+  margin-bottom: 20px;
+}
+
+.error-text {
+  color: #f44336;
+}
+
+.success-text {
+  color: #4caf50;
+}
