@@ -71,6 +71,8 @@ pids
 
 # Coverage directory
 coverage/
+frontend/coverage/
+backend/coverage/
 
 # Temporary folders
 tmp/
