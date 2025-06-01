@@ -14,7 +14,7 @@ const holdingSchema = Joi.object({
 const portfolioSchema = Joi.object({
   holdings: Joi.array().items(holdingSchema).required(),
   cashBalance: Joi.number().min(0).required(),
-  excludedCoins: Joi.array().items(Joi.string()).default([])
+  excludedCoins: Joi.array().items(Joi.string()).optional().default([])
 });
 
 const rebalanceSchema = Joi.object({

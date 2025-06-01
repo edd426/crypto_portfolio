@@ -131,7 +131,7 @@ export class AppComponent implements OnInit {
     this.isCalculating = true;
     this.rebalanceResult = null;
 
-    this.apiService.calculateRebalancing(portfolio, portfolio.excludedCoins).subscribe({
+    this.apiService.calculateRebalancing(portfolio).subscribe({
       next: (result) => {
         this.rebalanceResult = result;
         this.isCalculating = false;

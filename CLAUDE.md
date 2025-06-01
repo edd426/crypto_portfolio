@@ -2,21 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Status: ✅ FULLY FUNCTIONAL MVP
+## Project Status: ✅ FULLY FUNCTIONAL MVP + ENHANCED UI
 
-**Last Updated**: May 31, 2025  
-**Current Phase**: Phase 1 MVP Complete + Testing Framework  
-**Status**: Production-ready local development environment
+**Last Updated**: June 1, 2025  
+**Current Phase**: Phase 1 MVP Complete + Enhanced Visualization  
+**Status**: Production-ready with polished user interface
 
 ### 🎯 What Works Now
-- ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance
+- ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance with dropdown coin exclusion
 - ✅ **Rebalancing Calculation**: Real-time market cap-based rebalancing with CoinGecko API
+- ✅ **Interactive Charts**: Proportional bar charts showing current vs target portfolio composition
+- ✅ **Excluded Coin Handling**: Proper value calculation for excluded coins in current portfolio
 - ✅ **Trade Recommendations**: Buy/sell recommendations with USD values
 - ✅ **URL Persistence**: Portfolio data saved in URL parameters
 - ✅ **Responsive UI**: Angular Material design with proper form validation
 - ✅ **Error Handling**: Comprehensive error handling and user feedback
 - ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage
 - ✅ **CI/CD Pipeline**: GitHub Actions with automated testing and linting
+- ✅ **Debug System**: Configurable verbosity levels for troubleshooting
 
 ### 🚀 How to Start Development
 ```bash
@@ -164,6 +167,44 @@ curl -X POST http://localhost:3001/api/v1/rebalance/calculate \
   }'
 ```
 
+## Debug System
+
+The application includes a configurable debug system for troubleshooting chart and data issues.
+
+### Debug Levels
+- **Level 0**: No debug output (default, production)
+- **Level 1**: Errors only
+- **Level 2**: Errors + Warnings  
+- **Level 3**: Errors + Warnings + Info
+- **Level 4**: All debug output (verbose)
+
+### How to Enable Debug Mode
+
+**Method 1: URL Parameter**
+```
+http://localhost:4200?debug=3
+```
+
+**Method 2: Browser Console**
+```javascript
+localStorage.setItem('portfolioDebugLevel', '3');
+// Refresh page
+```
+
+**Method 3: Temporary Override**
+```javascript
+// In browser DevTools console
+window.portfolioDebugLevel = 3;
+```
+
+### Debug Output Examples
+```
+[INFO] Current Portfolio - maxPercentage: 72.9
+[WARN] BTC: No target allocation found (likely excluded coin)
+[ERROR] ETH: No price data available in allocations or trades
+[DEBUG] BTC: currentValue=10432, percentage=45.2%
+```
+
 ## Important Considerations
 
 - No user authentication (anonymous usage)
@@ -207,20 +248,32 @@ npm run test:coverage       # With coverage reports
 - Component tests: `src/app/components/__tests__/`
 - Service tests: `src/app/services/__tests__/`
 
-## Recent Critical Fixes (May 31, 2025)
+## Recent Critical Fixes & Enhancements (June 1, 2025)
 
-### 🐛 Fixed Issues
+### 🎨 UI/UX Improvements
+1. **Chart Visualization Fixed**: Bar charts now show proportional heights based on actual portfolio percentages
+2. **Excluded Coin Values**: Current portfolio correctly displays USD values for excluded coins
+3. **Interactive Tooltips**: Improved hover tooltips with proper disappearing behavior
+4. **Y-Axis Scaling**: Fixed Y-axis labels to show proper percentage ranges (0% at bottom)
+5. **Dropdown Coin Exclusion**: Enhanced UI with searchable dropdown for excluding coins
+
+### 🛠️ Technical Enhancements  
+6. **Debug Verbosity System**: Added configurable debug levels (0-4) for troubleshooting
+7. **Height Calculation**: Fixed CSS flex layout issues by using pixel-based bar heights
+8. **Price Resolution**: Enhanced price calculation for excluded coins using trade data
+9. **Event Handling**: Improved chart container mouse event management
+
+### 📁 Key Files Modified
+- `frontend/src/app/components/rebalancing-results/rebalancing-results.component.ts` - Chart fixes, debug system
+- `frontend/src/app/components/portfolio-entry/portfolio-entry.component.ts` - Dropdown exclusion UI
+- `backend/src/controllers/rebalanceController.ts` - Validation schema improvements
+
+### 🐛 Previous Fixes (May 31, 2025)
 1. **Rebalancing Validation Error**: Fixed backend validation schema to accept `excludedCoins` in portfolio object
 2. **Cache Isolation**: Changed MarketDataService to use instance-based cache for better test isolation  
 3. **Zone.js Import**: Updated import from `zone.js/dist/zone-testing` to `zone.js/testing`
 4. **Start Script**: Improved `start-dev.sh` with better process management and Angular CLI prompt suppression
 5. **ESLint Configuration**: Added proper ESLint configs for both frontend and backend
-
-### 📁 Key Files Modified
-- `backend/src/controllers/rebalanceController.ts` - Fixed validation schema
-- `backend/src/services/marketDataService.ts` - Instance-based cache
-- `frontend/src/test.ts` - Fixed zone.js import
-- `start-dev.sh` - Improved development workflow
 
 ## 🚀 Potential Next Steps for Future Development
 

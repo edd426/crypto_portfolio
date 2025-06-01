@@ -1,9 +1,9 @@
 # Crypto Portfolio Analyzer
 
-**Status**: ✅ FULLY FUNCTIONAL MVP  
-**Last Updated**: May 31, 2025
+**Status**: ✅ FULLY FUNCTIONAL MVP + ENHANCED UI  
+**Last Updated**: June 1, 2025
 
-A web-based cryptocurrency portfolio analyzer that helps users rebalance their holdings according to market capitalization of the top 15 cryptocurrencies, with real-time data from CoinGecko API.
+A web-based cryptocurrency portfolio analyzer that helps users rebalance their holdings according to market capitalization of the top 15 cryptocurrencies, with interactive charts, coin exclusion, and real-time data from CoinGecko API.
 
 ## 🎯 Live Demo
 
@@ -75,19 +75,21 @@ lsof -i :4200  # Frontend port
 
 ## 📊 Features
 
-### Phase 1 (Current MVP)
-✅ **Portfolio Entry**: Manually input crypto holdings and USD cash balance  
+### Phase 1 (Current MVP + Enhanced UI)
+✅ **Portfolio Entry**: Manually input crypto holdings with dropdown coin exclusion  
+✅ **Interactive Charts**: Proportional bar charts with hover tooltips showing portfolio composition  
 ✅ **Market Cap Rebalancing**: Automatic rebalancing based on top 15 coins by market cap  
+✅ **Excluded Coin Handling**: Proper value calculation for excluded coins in current portfolio  
 ✅ **Trade Recommendations**: Exact buy/sell amounts needed for rebalancing  
 ✅ **URL Persistence**: Save portfolio state in shareable URL parameters  
 ✅ **Real-time Data**: Live market data from CoinGecko API  
-✅ **Visual Charts**: Simple bar charts showing current vs target allocations  
+✅ **Debug System**: Configurable verbosity levels for troubleshooting  
 ✅ **Detailed Tables**: Trade recommendations and target allocations  
 
 ### Example Usage
 1. **Enter Holdings**: Add your current crypto positions (e.g., 0.5 BTC, 10 ETH)
 2. **Add Cash**: Enter your USD cash balance available for investment
-3. **Exclude Coins**: Optionally exclude specific coins from rebalancing
+3. **Exclude Coins**: Use dropdown to exclude specific coins (e.g., stablecoins) from rebalancing
 4. **Calculate**: Click "Calculate Rebalancing" to get recommendations
 5. **Review Results**: See exact trades needed and target allocations
 6. **Share Portfolio**: Generate shareable URL to save your portfolio settings

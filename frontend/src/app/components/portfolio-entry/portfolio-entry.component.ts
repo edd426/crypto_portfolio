@@ -8,10 +8,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, map, startWith } from 'rxjs/operators';
 
-import { Portfolio, Holding } from '../../models/portfolio.model';
+import { Portfolio, Holding, Coin } from '../../models/portfolio.model';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -26,7 +27,8 @@ import { ApiService } from '../../services/api.service';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSelectModule
   ],
   template: `
     <mat-card>
@@ -110,14 +112,15 @@ import { ApiService } from '../../services/api.service';
           <!-- Excluded Coins Section -->
           <div class="section">
             <h3>Exclude Coins (Optional)</h3>
-            <p class="hint">Coins to exclude from the top 15 rebalancing</p>
+            <p class="hint">Select coins to exclude from the top 15 rebalancing</p>
             
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Add coin to exclude</mat-label>
-              <input matInput 
-                     #excludeInput
-                     placeholder="DOGE, SHIB, etc."
-                     (keyup.enter)="addExcludedCoin(excludeInput.value); excludeInput.value = ''">
+              <mat-label>Select coin to exclude</mat-label>
+              <mat-select (selectionChange)="onCoinSelected($event.value)">
+                <mat-option *ngFor="let coin of getAvailableCoins()" [value]="coin.symbol">
+                  {{coin.symbol}} - {{coin.name}}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
             <div class="excluded-chips" *ngIf="excludedCoins.length > 0">
@@ -211,6 +214,7 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
   portfolioForm: FormGroup;
   excludedCoins: string[] = [];
   isSubmitting = false;
+  availableCoinsForExclusion: Coin[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -225,6 +229,33 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
       distinctUntilChanged()
     ).subscribe(() => {
       this.emitPortfolioChange();
+    });
+    
+    // Load top coins for exclusion dropdown
+    this.loadTopCoins();
+  }
+
+  private loadTopCoins(): void {
+    this.apiService.getTopCoins(20).subscribe({
+      next: (response) => {
+        this.availableCoinsForExclusion = response.data;
+      },
+      error: (error) => {
+        console.error('Error loading top coins for exclusion:', error);
+        // Fallback with common coins
+        this.availableCoinsForExclusion = [
+          { rank: 1, symbol: 'BTC', name: 'Bitcoin', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 2, symbol: 'ETH', name: 'Ethereum', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 3, symbol: 'USDT', name: 'Tether', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 4, symbol: 'BNB', name: 'BNB', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 5, symbol: 'XRP', name: 'XRP', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 6, symbol: 'USDC', name: 'USD Coin', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 7, symbol: 'SOL', name: 'Solana', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 8, symbol: 'DOGE', name: 'Dogecoin', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 9, symbol: 'ADA', name: 'Cardano', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+          { rank: 10, symbol: 'TRX', name: 'TRON', price: 0, marketCap: 0, change24h: 0, volume24h: 0 }
+        ];
+      }
     });
   }
 
@@ -286,6 +317,19 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
   removeHolding(index: number): void {
     if (this.holdingsArray.length > 1) {
       this.holdingsArray.removeAt(index);
+    }
+  }
+
+  getAvailableCoins(): Coin[] {
+    return this.availableCoinsForExclusion.filter(coin => 
+      !this.excludedCoins.includes(coin.symbol)
+    );
+  }
+
+  onCoinSelected(symbol: string): void {
+    if (symbol && !this.excludedCoins.includes(symbol)) {
+      this.excludedCoins.push(symbol);
+      this.emitPortfolioChange();
     }
   }
 

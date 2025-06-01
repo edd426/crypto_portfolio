@@ -1,18 +1,21 @@
 # Project Status Summary
 
-**Date**: May 31, 2025  
-**Status**: ✅ FULLY FUNCTIONAL MVP  
+**Date**: June 1, 2025  
+**Status**: ✅ FULLY FUNCTIONAL MVP + ENHANCED UI  
 **Next Agent**: Ready for Phase 2 development or production deployment
 
 ## 🎯 Current Capabilities
 
 ### Working Features
-- ✅ **Portfolio Entry**: Full UI for entering crypto holdings
+- ✅ **Portfolio Entry**: Full UI with dropdown coin exclusion and validation
+- ✅ **Interactive Charts**: Proportional bar charts showing portfolio composition
 - ✅ **Real-time Rebalancing**: Market cap-based rebalancing with live CoinGecko data
+- ✅ **Excluded Coin Handling**: Proper value calculation for excluded coins
 - ✅ **Trade Recommendations**: Detailed buy/sell recommendations with USD values
 - ✅ **URL Persistence**: Portfolio automatically saved to URL parameters
 - ✅ **Error Handling**: Comprehensive error handling and user feedback
-- ✅ **Responsive Design**: Angular Material UI components
+- ✅ **Responsive Design**: Angular Material UI with enhanced tooltips
+- ✅ **Debug System**: Configurable debug verbosity for troubleshooting
 
 ### Technical Implementation
 - ✅ **Backend API**: Express.js server with TypeScript
@@ -36,24 +39,45 @@ npm install
 # Health Check: http://localhost:3001/api/v1/health
 ```
 
-## 📊 Test Portfolio for Quick Testing
+## 📊 Test Portfolios for Quick Testing
 
-Use this data to test the rebalancing functionality:
+### Basic Rebalancing Test
 - **BTC**: 0.5
 - **ETH**: 7  
 - **Cash Balance**: $800
 - **Excluded Coins**: (leave empty)
 
+### Excluded Coin Test
+- **BTC**: 0.1
+- **ETH**: 2
+- **ADA**: 1000
+- **Cash Balance**: $500
+- **Excluded Coins**: BTC, USDT, USDC
+
+### Debug Mode Testing
+- Add `?debug=3` to URL for detailed console output
+- Or set `localStorage.setItem('portfolioDebugLevel', '3')` in browser console
+
 ## 🔄 Recent Major Changes
 
-### Fixes Applied (Session: May 31, 2025)
+### UI/UX Enhancements (Session: June 1, 2025)
+1. **Fixed Chart Visualization**: Bar heights now proportional to actual portfolio percentages
+2. **Enhanced Coin Exclusion**: Dropdown UI with top 20 coins for easy exclusion
+3. **Excluded Coin Values**: Current portfolio correctly shows USD values for excluded coins  
+4. **Interactive Tooltips**: Improved hover behavior with proper event handling
+5. **Y-Axis Scaling**: Fixed axis labels to show correct percentage ranges
+6. **Debug System**: Added configurable verbosity levels (0-4) for troubleshooting
+7. **Height Calculation**: Resolved CSS flex layout issues with pixel-based bar heights
+
+### Previous Fixes (Session: May 31, 2025)
 1. Fixed rebalancing API validation error (excludedCoins schema issue)
 2. Improved development server startup script
 3. Added comprehensive testing framework
 4. Fixed frontend test configurations
 5. Added ESLint configurations
 
-### Git Commits
+### Recent Git Commits
+- `Latest`: Enhanced chart visualization and debug system
 - `137964a`: Fix rebalancing calculation API validation error
 - `1b109c0`: Add comprehensive testing framework and CI/CD pipeline
 
