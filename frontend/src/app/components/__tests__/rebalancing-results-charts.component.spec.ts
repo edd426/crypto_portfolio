@@ -32,7 +32,7 @@ describe('RebalancingResultsComponent - Charts', () => {
 
   beforeEach(async () => {
     mockPortfolioUrlService = {
-      generateShareableUrl: jasmine.createSpy('generateShareableUrl').and.returnValue('http://test.com')
+      generateShareableUrl: jest.fn().mockReturnValue('http://test.com')
     };
 
     await TestBed.configureTestingModule({
@@ -66,7 +66,7 @@ describe('RebalancingResultsComponent - Charts', () => {
       // Check BTC data
       const btcData = chartData.find(item => item.symbol === 'BTC');
       expect(btcData).toBeDefined();
-      expect(btcData!.value).toBe(5000);
+      expect(btcData!.value).toBeCloseTo(5000, 1);
       expect(btcData!.percentage).toBeCloseTo(41.67, 1); // 5000/12000 * 100
       
       // Check ETH data

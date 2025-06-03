@@ -5,6 +5,12 @@ module.exports = {
     '<rootDir>/src/**/__tests__/**/*.spec.ts',
     '<rootDir>/src/**/?(*.)+(spec|test).ts'
   ],
+  testPathIgnorePatterns: [
+    '<rootDir>/src/test.ts'
+  ],
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',

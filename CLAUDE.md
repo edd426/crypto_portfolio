@@ -4,20 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status: ✅ FULLY FUNCTIONAL MVP + ENHANCED UI
 
-**Last Updated**: June 1, 2025  
-**Current Phase**: Phase 1 MVP Complete + Enhanced Visualization  
-**Status**: Production-ready with polished user interface
+**Last Updated**: June 3, 2025  
+**Current Phase**: Phase 1 MVP Complete + Enhanced UI & Features  
+**Status**: Production-ready with advanced portfolio management features
 
 ### 🎯 What Works Now
-- ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance with dropdown coin exclusion
+- ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance with manual text exclusion
 - ✅ **Rebalancing Calculation**: Real-time market cap-based rebalancing with CoinGecko API
 - ✅ **Interactive Charts**: Proportional bar charts showing current vs target portfolio composition
-- ✅ **Excluded Coin Handling**: Proper value calculation for excluded coins in current portfolio
+- ✅ **Smart Exclusion System**: Visual feedback showing effective vs ineffective coin exclusions
+- ✅ **Configurable Portfolio Size**: User-defined max coins (1-50) with exclusions counting against limit
+- ✅ **Enhanced Allocations View**: Current vs target comparison with cash holdings included
 - ✅ **Trade Recommendations**: Buy/sell recommendations with USD values
-- ✅ **URL Persistence**: Portfolio data saved in URL parameters
+- ✅ **URL Persistence**: Portfolio data saved in clean URL parameters (no timestamps)
 - ✅ **Responsive UI**: Angular Material design with proper form validation
-- ✅ **Error Handling**: Comprehensive error handling and user feedback
-- ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage
+- ✅ **Robust Error Handling**: Rate limiting awareness and user-friendly API error messages
+- ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage + rate limiting tests
 - ✅ **CI/CD Pipeline**: GitHub Actions with automated testing and linting
 - ✅ **Debug System**: Configurable verbosity levels for troubleshooting
 
@@ -126,11 +128,13 @@ crypto_portfolio/
 
 ## Key Features
 
-### Phase 1 (MVP)
-- Manual portfolio entry
-- Market cap-based rebalancing for top 15 coins
-- URL-based portfolio persistence
-- Trade recommendations
+### Phase 1 (MVP) ✅ COMPLETE
+- Manual portfolio entry with text-based coin exclusion
+- Market cap-based rebalancing for configurable portfolio size (1-50 coins)
+- URL-based portfolio persistence (clean URLs without timestamps)
+- Trade recommendations with USD values
+- Enhanced allocations view with current vs target comparison
+- Robust error handling including rate limiting
 
 ### Phase 2
 - Historical backtesting
@@ -248,7 +252,52 @@ npm run test:coverage       # With coverage reports
 - Component tests: `src/app/components/__tests__/`
 - Service tests: `src/app/services/__tests__/`
 
-## Recent Critical Fixes & Enhancements (June 1, 2025)
+## Recent Critical Fixes & Enhancements (June 3, 2025)
+
+### 🎯 Major Feature Additions
+1. **Manual Coin Exclusion System**: Replaced dropdown with text input for better UX with large portfolios
+   - Support for comma-separated input (e.g., "BTC, ETH, USDT")
+   - Visual feedback showing effective vs ineffective exclusions after calculation
+   - Color-coded chips: green for effective exclusions, yellow for ineffective ones
+   - Enhanced tooltips explaining exclusion effectiveness
+
+2. **Enhanced Allocations Tab**: Complete redesign of "Target Allocations" → "Allocations"
+   - Added current portfolio columns: Current %, Current Value, Current Amount
+   - Cash holdings now included as a dedicated row
+   - Side-by-side comparison of current vs target allocations
+   - Improved table styling and right-aligned numeric columns
+
+3. **Configurable Portfolio Size**: Added maxCoins parameter (1-50, default 15)
+   - Excluded coins count against the portfolio limit
+   - URL persistence for maxCoins parameter
+   - Form validation and user guidance
+
+4. **Rate Limiting & Error Handling**: Comprehensive API error management
+   - Specific handling for 429 rate limit errors with retry timing
+   - User-friendly error messages for different API failure scenarios
+   - Enhanced frontend error display with dynamic duration
+
+### 🛠️ Technical Improvements
+5. **URL Parameter Cleanup**: Removed timestamp parameter for cleaner URLs
+6. **Button Consolidation**: Streamlined Generate Portfolio URL functionality
+   - Single button placement in portfolio entry form for immediate access
+   - Removed duplicate grey section button from results
+   - Different button styling (primary vs accent colors)
+
+7. **Testing Coverage**: Added comprehensive rate limiting test suite
+   - 6 new test cases covering API error scenarios
+   - Maintained 58/58 passing frontend tests
+   - Enhanced error message validation
+
+### 📁 Key Files Modified (June 3, 2025)
+- `frontend/src/app/components/portfolio-entry/portfolio-entry.component.ts` - Manual exclusion UI, button consolidation
+- `frontend/src/app/components/rebalancing-results/rebalancing-results.component.ts` - Enhanced allocations tab, removed duplicate button
+- `frontend/src/app/services/portfolio-url.service.ts` - Removed timestamp parameter
+- `backend/src/services/marketDataService.ts` - Enhanced error handling with specific messages
+- `backend/src/__tests__/unit/marketDataService.rateLimiting.test.ts` - New comprehensive test suite
+- `frontend/src/app/app.component.ts` - Improved error handling and exclusion feedback
+
+## Previous Enhancements (June 1, 2025)
 
 ### 🎨 UI/UX Improvements
 1. **Chart Visualization Fixed**: Bar charts now show proportional heights based on actual portfolio percentages
@@ -275,9 +324,29 @@ npm run test:coverage       # With coverage reports
 4. **Start Script**: Improved `start-dev.sh` with better process management and Angular CLI prompt suppression
 5. **ESLint Configuration**: Added proper ESLint configs for both frontend and backend
 
-## 🚀 Potential Next Steps for Future Development
+## 🚀 Next Development Priority
 
-### Phase 2 Features (Not Yet Implemented)
+### 🎯 **IMMEDIATE FOCUS: Azure Production Deployment**
+
+**The application is production-ready and the next developer should prioritize robust Azure deployment.**
+
+#### Priority 1: Azure Production Deployment (URGENT)
+- [ ] **Deploy to Azure** using existing infrastructure planning in `/docs/DEPLOYMENT_INFRASTRUCTURE.md`
+- [ ] Set up Azure Container Instances with Terraform configurations
+- [ ] Configure Azure Application Gateway for load balancing and SSL
+- [ ] Implement Azure Database for PostgreSQL for portfolio persistence
+- [ ] Set up Azure Application Insights for monitoring and logging
+- [ ] Configure Azure Key Vault for secrets management
+- [ ] Deploy CI/CD pipeline using existing GitHub Actions
+
+#### Priority 2: Post-Deployment Optimization
+- [ ] Add Azure Cache for Redis for improved performance
+- [ ] Implement auto-scaling policies
+- [ ] Set up automated backups and disaster recovery
+- [ ] Configure custom domain and SSL certificates
+- [ ] Optimize Azure costs and resource allocation
+
+#### Priority 3: Phase 2 Features (After Production Deployment)
 - [ ] Historical backtesting with date range selection
 - [ ] Multiple rebalancing frequencies (daily, weekly, monthly)
 - [ ] Performance metrics calculation (Sharpe ratio, max drawdown)
@@ -285,19 +354,14 @@ npm run test:coverage       # With coverage reports
 - [ ] Portfolio comparison and analytics
 - [ ] Export functionality (CSV, PDF reports)
 
-### Infrastructure Improvements
-- [ ] Deploy to production (Azure, Vercel, or similar)
-- [ ] Add Redis caching for improved performance
-- [ ] Implement rate limiting for CoinGecko API
-- [ ] Add database for user portfolio persistence
-- [ ] Set up monitoring and logging
-
-### UI/UX Enhancements
+#### Priority 4: UI/UX Enhancements
 - [ ] Add portfolio visualization charts
 - [ ] Implement responsive mobile design
 - [ ] Add dark mode toggle
 - [ ] Portfolio simulation and "what-if" scenarios
 - [ ] Improve loading states and animations
+
+**Note**: All Azure infrastructure planning and Terraform configurations are already documented in `/docs/DEPLOYMENT_INFRASTRUCTURE.md`. The application is fully ready for production deployment.
 
 ## Development Guidelines
 

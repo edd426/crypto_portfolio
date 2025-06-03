@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, map, startWith } from 'rxjs/operators';
 
@@ -28,7 +29,8 @@ import { ApiService } from '../../services/api.service';
     MatIconModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ],
   template: `
     <mat-card>
@@ -109,26 +111,69 @@ import { ApiService } from '../../services/api.service';
             </mat-form-field>
           </div>
 
+          <!-- Max Coins Section -->
+          <div class="section">
+            <h3>Portfolio Size</h3>
+            <mat-form-field appearance="outline" class="max-coins-field">
+              <mat-label>Maximum coins in target portfolio</mat-label>
+              <input matInput 
+                     type="number" 
+                     min="1"
+                     max="50"
+                     placeholder="15"
+                     formControlName="maxCoins">
+              <mat-hint>Default: 15 coins. Excluded coins count against this limit.</mat-hint>
+              <mat-error *ngIf="portfolioForm.get('maxCoins')?.hasError('min')">
+                Must be at least 1
+              </mat-error>
+              <mat-error *ngIf="portfolioForm.get('maxCoins')?.hasError('max')">
+                Cannot exceed 50
+              </mat-error>
+            </mat-form-field>
+          </div>
+
           <!-- Excluded Coins Section -->
           <div class="section">
             <h3>Exclude Coins (Optional)</h3>
-            <p class="hint">Select coins to exclude from the top 15 rebalancing</p>
+            <p class="hint">Enter coin symbols to exclude from the target portfolio (e.g., BTC, ETH, USDT)</p>
             
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Select coin to exclude</mat-label>
-              <mat-select (selectionChange)="onCoinSelected($event.value)">
-                <mat-option *ngFor="let coin of getAvailableCoins()" [value]="coin.symbol">
-                  {{coin.symbol}} - {{coin.name}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="exclusion-input-container">
+              <mat-form-field appearance="outline" class="exclusion-input">
+                <mat-label>Add coin symbol to exclude</mat-label>
+                <input matInput 
+                       #coinInput
+                       placeholder="e.g., BTC, ETH, USDT"
+                       (keydown.enter)="addExcludedCoinFromInput(coinInput)"
+                       (keydown.comma)="addExcludedCoinFromInput(coinInput)"
+                       (blur)="addExcludedCoinFromInput(coinInput)">
+                <mat-hint>Press Enter, comma, or click away to add</mat-hint>
+              </mat-form-field>
+              
+              <button mat-icon-button 
+                      type="button"
+                      color="primary"
+                      (click)="addExcludedCoinFromInput(coinInput)"
+                      class="add-exclusion-btn">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
 
             <div class="excluded-chips" *ngIf="excludedCoins.length > 0">
+              <p class="chips-hint">
+                Excluded coins will be highlighted after calculation to show their effectiveness
+              </p>
               <mat-chip-listbox>
                 <mat-chip-option *ngFor="let coin of excludedCoins" 
+                                 [class.ineffective]="isExclusionIneffective(coin)"
+                                 [class.effective]="isExclusionEffective(coin)"
                                  (removed)="removeExcludedCoin(coin)">
                   {{coin}}
                   <mat-icon matChipRemove>cancel</mat-icon>
+                  <mat-icon *ngIf="isExclusionIneffective(coin)" 
+                           class="status-icon"
+                           matTooltip="This coin is not in the top portfolio by market cap">
+                    info
+                  </mat-icon>
                 </mat-chip-option>
               </mat-chip-listbox>
             </div>
@@ -142,6 +187,16 @@ import { ApiService } from '../../services/api.service';
                     [disabled]="portfolioForm.invalid || isSubmitting"
                     class="calculate-button">
               {{isSubmitting ? 'Calculating...' : 'Calculate Rebalancing'}}
+            </button>
+            
+            <button mat-stroked-button 
+                    color="accent" 
+                    type="button"
+                    [disabled]="portfolioForm.invalid"
+                    (click)="onGenerateUrl()"
+                    class="url-button">
+              <mat-icon>share</mat-icon>
+              Generate Portfolio URL
             </button>
           </div>
         </form>
@@ -181,13 +236,26 @@ import { ApiService } from '../../services/api.service';
     .actions {
       display: flex;
       justify-content: center;
+      gap: 16px;
       margin-top: 24px;
+      flex-wrap: wrap;
     }
 
     .calculate-button {
       min-width: 200px;
       height: 48px;
       font-size: 16px;
+    }
+
+    .url-button {
+      min-width: 200px;
+      height: 48px;
+      font-size: 16px;
+    }
+
+    .max-coins-field {
+      width: 100%;
+      max-width: 300px;
     }
 
     .hint {
@@ -204,16 +272,55 @@ import { ApiService } from '../../services/api.service';
       margin-bottom: 16px;
       color: #1976d2;
     }
+
+    .exclusion-input-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .exclusion-input {
+      flex: 1;
+    }
+
+    .add-exclusion-btn {
+      margin-top: 8px;
+    }
+
+    .chips-hint {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.54);
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    .effective {
+      background-color: #c8e6c9 !important;
+      color: #2e7d32 !important;
+    }
+
+    .ineffective {
+      background-color: #ffecb3 !important;
+      color: #f57c00 !important;
+    }
+
+    .status-icon {
+      font-size: 16px;
+      margin-left: 4px;
+    }
   `]
 })
 export class PortfolioEntryComponent implements OnInit, OnChanges {
   @Input() initialPortfolio: Portfolio | null = null;
   @Output() portfolioSubmitted = new EventEmitter<Portfolio>();
   @Output() portfolioChanged = new EventEmitter<Portfolio>();
+  @Output() generateUrl = new EventEmitter<Portfolio>();
 
   portfolioForm: FormGroup;
   excludedCoins: string[] = [];
   isSubmitting = false;
+  topPortfolioCoins: string[] = []; // Coins that are actually in the top X by market cap
   availableCoinsForExclusion: Coin[] = [];
 
   constructor(
@@ -272,7 +379,8 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
   private createForm(): FormGroup {
     return this.fb.group({
       holdings: this.fb.array([this.createHoldingFormGroup()]),
-      cashBalance: [0, [Validators.min(0)]]
+      cashBalance: [0, [Validators.min(0)]],
+      maxCoins: [15, [Validators.min(1), Validators.max(50)]]
     });
   }
 
@@ -301,9 +409,10 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
       this.holdingsArray.push(this.createHoldingFormGroup());
     }
 
-    // Set cash balance
+    // Set cash balance and maxCoins
     this.portfolioForm.patchValue({
-      cashBalance: portfolio.cashBalance || 0
+      cashBalance: portfolio.cashBalance || 0,
+      maxCoins: portfolio.maxCoins || 15
     });
 
     // Set excluded coins
@@ -341,6 +450,42 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
     }
   }
 
+  addExcludedCoinFromInput(inputElement: HTMLInputElement): void {
+    const value = inputElement.value.trim();
+    if (!value) return;
+    
+    // Handle comma-separated values
+    const symbols = value.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
+    
+    symbols.forEach(symbol => {
+      if (symbol && !this.excludedCoins.includes(symbol)) {
+        this.excludedCoins.push(symbol);
+      }
+    });
+    
+    // Clear the input
+    inputElement.value = '';
+    this.emitPortfolioChange();
+  }
+
+  isExclusionEffective(coinSymbol: string): boolean {
+    // A coin exclusion is effective if it's in the top portfolio coins
+    // (meaning it would have been included without the exclusion)
+    return this.topPortfolioCoins.includes(coinSymbol);
+  }
+
+  isExclusionIneffective(coinSymbol: string): boolean {
+    // A coin exclusion is ineffective if we have calculated results
+    // and the coin is NOT in the top portfolio coins
+    return this.topPortfolioCoins.length > 0 && !this.topPortfolioCoins.includes(coinSymbol);
+  }
+
+  updateTopPortfolioCoins(coins: string[]): void {
+    // This method will be called from the parent component after rebalancing calculation
+    // to update which coins are actually in the top portfolio by market cap
+    this.topPortfolioCoins = [...coins];
+  }
+
   removeExcludedCoin(coinSymbol: string): void {
     const index = this.excludedCoins.indexOf(coinSymbol);
     if (index >= 0) {
@@ -374,6 +519,14 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
     }
   }
 
+  onGenerateUrl(): void {
+    if (this.portfolioForm.valid) {
+      const portfolio = this.buildPortfolio();
+      this.generateUrl.emit(portfolio);
+    }
+  }
+
+
   private buildPortfolio(): Portfolio {
     const formValue = this.portfolioForm.value;
     
@@ -387,7 +540,8 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
     return {
       holdings,
       cashBalance: parseFloat(formValue.cashBalance) || 0,
-      excludedCoins: [...this.excludedCoins]
+      excludedCoins: [...this.excludedCoins],
+      maxCoins: parseInt(formValue.maxCoins) || 15
     };
   }
 }

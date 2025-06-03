@@ -1,4 +1,5 @@
 // This file is required by karma.conf.js and loads recursively all the .spec and framework files
+// NOTE: This file is NOT used by Jest - Jest uses setup-jest.ts instead
 
 import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';

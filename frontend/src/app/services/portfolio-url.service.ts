@@ -29,8 +29,10 @@ export class PortfolioUrlService {
       params.exclude = portfolio.excludedCoins.join(',');
     }
     
-    // Add timestamp
-    params.t = Math.floor(Date.now() / 1000).toString();
+    // Add maxCoins if different from default
+    if (portfolio.maxCoins && portfolio.maxCoins !== 15) {
+      params.maxCoins = portfolio.maxCoins.toString();
+    }
     
     this.router.navigate([], {
       relativeTo: this.route,
@@ -40,7 +42,12 @@ export class PortfolioUrlService {
   }
 
   loadPortfolioFromUrl(): Portfolio | null {
-    const queryParams = this.route.snapshot.queryParams;
+    // Use current URL params instead of snapshot for better reliability
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParams: any = {};
+    urlParams.forEach((value, key) => {
+      queryParams[key] = value;
+    });
     
     if (!queryParams['p'] && !queryParams['cash']) {
       return null;
@@ -68,10 +75,14 @@ export class PortfolioUrlService {
       queryParams['exclude'].split(',').map((s: string) => s.trim().toUpperCase()) : 
       [];
     
+    // Parse maxCoins
+    const maxCoins = queryParams['maxCoins'] ? parseInt(queryParams['maxCoins']) : 15;
+    
     return {
       holdings,
       cashBalance: isNaN(cashBalance) ? 0 : cashBalance,
-      excludedCoins
+      excludedCoins,
+      maxCoins: isNaN(maxCoins) ? 15 : maxCoins
     };
   }
 
@@ -93,7 +104,9 @@ export class PortfolioUrlService {
       params.set('exclude', portfolio.excludedCoins.join(','));
     }
     
-    params.set('t', Math.floor(Date.now() / 1000).toString());
+    if (portfolio.maxCoins && portfolio.maxCoins !== 15) {
+      params.set('maxCoins', portfolio.maxCoins.toString());
+    }
     
     return `${baseUrl}?${params.toString()}`;
   }

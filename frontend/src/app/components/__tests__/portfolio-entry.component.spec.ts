@@ -17,7 +17,19 @@ describe('PortfolioEntryComponent', () => {
 
   beforeEach(async () => {
     const apiServiceSpy = {
-      searchCoins: jest.fn()
+      searchCoins: jest.fn(),
+      getTopCoins: jest.fn().mockReturnValue({
+        subscribe: jest.fn().mockImplementation((callbacks) => {
+          callbacks.next({
+            data: [
+              { rank: 1, symbol: 'BTC', name: 'Bitcoin', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+              { rank: 2, symbol: 'ETH', name: 'Ethereum', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },
+              { rank: 3, symbol: 'USDT', name: 'Tether', price: 0, marketCap: 0, change24h: 0, volume24h: 0 }
+            ]
+          });
+          return { unsubscribe: jest.fn() };
+        })
+      })
     };
 
     await TestBed.configureTestingModule({
@@ -127,7 +139,7 @@ describe('PortfolioEntryComponent', () => {
     expect(component.excludedCoins).toEqual(['DOGE']);
   });
 
-  it('should emit portfolio on form submission', () => {
+  it('should emit portfolio on form submission', (done) => {
     const portfolioSubmittedSpy = jest.spyOn(component.portfolioSubmitted, 'emit');
     
     // Set valid form data
@@ -141,11 +153,17 @@ describe('PortfolioEntryComponent', () => {
 
     component.onSubmit();
 
-    expect(portfolioSubmittedSpy).toHaveBeenCalledWith({
-      holdings: [{ symbol: 'BTC', amount: 1 }],
-      cashBalance: 1000,
-      excludedCoins: []
-    });
+    // onSubmit has a setTimeout delay, so wait for it
+    setTimeout(() => {
+
+      expect(portfolioSubmittedSpy).toHaveBeenCalledWith({
+        holdings: [{ symbol: 'BTC', amount: 1 }],
+        cashBalance: 1000,
+        excludedCoins: [],
+        maxCoins: 15
+      });
+      done();
+    }, 350);
   });
 
   it('should not submit invalid form', () => {
@@ -200,6 +218,100 @@ describe('PortfolioEntryComponent', () => {
     expect(portfolio.holdings[0]).toEqual({
       symbol: 'BTC',
       amount: 1
+    });
+  });
+
+  describe('maxCoins functionality', () => {
+    it('should initialize with default maxCoins value of 15', () => {
+      expect(component.portfolioForm.get('maxCoins')?.value).toBe(15);
+    });
+
+    it('should include maxCoins in built portfolio', () => {
+      component.holdingsArray.at(0).patchValue({
+        symbol: 'BTC',
+        amount: 1
+      });
+      component.portfolioForm.patchValue({
+        cashBalance: 1000,
+        maxCoins: 20
+      });
+
+      const portfolio = (component as any).buildPortfolio();
+
+      expect(portfolio.maxCoins).toBe(20);
+      expect(portfolio.holdings).toEqual([{ symbol: 'BTC', amount: 1 }]);
+      expect(portfolio.cashBalance).toBe(1000);
+    });
+
+    it('should load maxCoins from initial portfolio', () => {
+      const initialPortfolio = {
+        holdings: [{ symbol: 'BTC', amount: 0.5 }],
+        cashBalance: 5000,
+        excludedCoins: ['DOGE'],
+        maxCoins: 25
+      };
+
+      component.initialPortfolio = initialPortfolio;
+      component.ngOnChanges();
+
+      expect(component.portfolioForm.get('maxCoins')?.value).toBe(25);
+    });
+
+    it('should default to 15 when maxCoins is not provided in initial portfolio', () => {
+      const initialPortfolio = {
+        holdings: [{ symbol: 'BTC', amount: 0.5 }],
+        cashBalance: 5000,
+        excludedCoins: []
+      };
+
+      component.initialPortfolio = initialPortfolio;
+      component.ngOnChanges();
+
+      expect(component.portfolioForm.get('maxCoins')?.value).toBe(15);
+    });
+
+    it('should validate maxCoins field properly', () => {
+      const maxCoinsControl = component.portfolioForm.get('maxCoins');
+
+      // Test minimum validation
+      maxCoinsControl?.setValue(0);
+      expect(maxCoinsControl?.hasError('min')).toBe(true);
+
+      // Test maximum validation
+      maxCoinsControl?.setValue(51);
+      expect(maxCoinsControl?.hasError('max')).toBe(true);
+
+      // Test valid values
+      maxCoinsControl?.setValue(15);
+      expect(maxCoinsControl?.valid).toBe(true);
+
+      maxCoinsControl?.setValue(1);
+      expect(maxCoinsControl?.valid).toBe(true);
+
+      maxCoinsControl?.setValue(50);
+      expect(maxCoinsControl?.valid).toBe(true);
+    });
+
+    it('should emit portfolio changes when maxCoins value changes', (done) => {
+      const portfolioChangedSpy = jest.spyOn(component.portfolioChanged, 'emit');
+      
+      // Set valid form data including maxCoins
+      component.holdingsArray.at(0).patchValue({
+        symbol: 'BTC',
+        amount: 1
+      });
+      component.portfolioForm.patchValue({
+        cashBalance: 1000,
+        maxCoins: 25
+      });
+
+      // Wait for debounced emission
+      setTimeout(() => {
+        expect(portfolioChangedSpy).toHaveBeenCalled();
+        const emittedPortfolio = portfolioChangedSpy.mock.calls[0][0];
+        expect(emittedPortfolio?.maxCoins).toBe(25);
+        done();
+      }, 350);
     });
   });
 });

@@ -85,8 +85,8 @@ describe('Exclude Coins Integration Tests', () => {
     expect(symbols).toContain('BTC');
     expect(symbols).toContain('ETH');
     
-    // Should have 15 allocations (since USDT is excluded)
-    expect(response.body.targetAllocations).toHaveLength(15);
+    // Should have 14 allocations (15 max minus 1 excluded from top 15)
+    expect(response.body.targetAllocations).toHaveLength(14);
   });
 
   it('should exclude multiple coins when specified', async () => {
@@ -110,8 +110,8 @@ describe('Exclude Coins Integration Tests', () => {
     expect(symbols).not.toContain('USDC');
     expect(symbols).not.toContain('BUSD');
     
-    // Should still have 15 allocations
-    expect(response.body.targetAllocations).toHaveLength(15);
+    // Should have 12 allocations (15 max minus 3 excluded from top 15)
+    expect(response.body.targetAllocations).toHaveLength(12);
   });
 
   it('should include USDT when excludedCoins is empty', async () => {
@@ -199,5 +199,49 @@ describe('Exclude Coins Integration Tests', () => {
     
     // Should exclude USDT (from top-level excludedCoins)
     expect(symbols).not.toContain('USDT');
+  });
+
+  it('should respect maxCoins parameter in portfolio', async () => {
+    const portfolio = {
+      holdings: [
+        { symbol: 'BTC', amount: 0.1 }
+      ],
+      cashBalance: 1000,
+      excludedCoins: [],
+      maxCoins: 10
+    };
+
+    const response = await request(app)
+      .post('/api/v1/rebalance/calculate')
+      .send({ portfolio })
+      .expect(200);
+
+    // Should have exactly 10 allocations
+    expect(response.body.targetAllocations).toHaveLength(10);
+  });
+
+  it('should respect maxCoins with exclusions counting against limit', async () => {
+    const portfolio = {
+      holdings: [
+        { symbol: 'BTC', amount: 0.1 }
+      ],
+      cashBalance: 1000,
+      excludedCoins: ['USDT', 'USDC'],
+      maxCoins: 10
+    };
+
+    const response = await request(app)
+      .post('/api/v1/rebalance/calculate')
+      .send({ portfolio })
+      .expect(200);
+
+    const symbols = response.body.targetAllocations.map((allocation: any) => allocation.symbol);
+    
+    // Should not contain excluded coins
+    expect(symbols).not.toContain('USDT');
+    expect(symbols).not.toContain('USDC');
+    
+    // Should have 8 allocations (10 max minus 2 excluded from top 10)
+    expect(response.body.targetAllocations).toHaveLength(8);
   });
 });

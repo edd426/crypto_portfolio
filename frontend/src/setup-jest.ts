@@ -1,6 +1,22 @@
 import 'jest-preset-angular/setup-jest';
 import '@testing-library/jest-dom';
 
+// Ensure clean state between tests
+beforeEach(() => {
+  // Clear any existing TestBed configuration
+  if ((global as any).TestBed) {
+    (global as any).TestBed.resetTestingModule();
+  }
+  
+  // Clear localStorage
+  localStorage.clear();
+  
+  // Reset URL search params
+  if (typeof window !== 'undefined' && window.history) {
+    window.history.replaceState({}, '', '/');
+  }
+});
+
 // Mock global objects
 Object.defineProperty(window, 'CSS', { value: null });
 Object.defineProperty(window, 'getComputedStyle', {

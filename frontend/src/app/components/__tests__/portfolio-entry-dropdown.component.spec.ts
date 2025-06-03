@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 
 import { PortfolioEntryComponent } from '../portfolio-entry/portfolio-entry.component';
 import { ApiService } from '../../services/api.service';
@@ -24,7 +24,9 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
   };
 
   beforeEach(async () => {
-    const apiServiceSpy = jasmine.createSpyObj('ApiService', ['getTopCoins']);
+    const apiServiceSpy = {
+      getTopCoins: jest.fn()
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -43,7 +45,7 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
   });
 
   it('should load top coins for exclusion dropdown on init', fakeAsync(() => {
-    mockApiService.getTopCoins.and.returnValue(of(mockTopCoins));
+    mockApiService.getTopCoins.mockReturnValue(of(mockTopCoins));
 
     component.ngOnInit();
     tick();
@@ -65,7 +67,13 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
   });
 
   it('should add coin to excluded list when selected from dropdown', () => {
-    spyOn(component.portfolioChanged, 'emit');
+    jest.spyOn(component.portfolioChanged, 'emit');
+    
+    // Need to set form to valid state for portfolioChanged to emit
+    component.holdingsArray.at(0).patchValue({
+      symbol: 'BTC',
+      amount: 1
+    });
     component.portfolioForm.patchValue({ cashBalance: 1000 });
     
     component.onCoinSelected('USDT');
@@ -85,7 +93,16 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
 
   it('should remove coin from excluded list when chip is removed', () => {
     component.excludedCoins = ['USDT', 'BNB'];
-    spyOn(component.portfolioChanged, 'emit');
+    jest.spyOn(component.portfolioChanged, 'emit');
+    
+    // Need to set form to valid state for portfolioChanged to emit
+    component.holdingsArray.at(0).patchValue({
+      symbol: 'BTC',
+      amount: 1
+    });
+    component.portfolioForm.patchValue({
+      cashBalance: 1000
+    });
     
     component.removeExcludedCoin('USDT');
 
@@ -106,11 +123,12 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
   });
 
   it('should handle API error gracefully with fallback coins', fakeAsync(() => {
-    mockApiService.getTopCoins.and.returnValue(of().pipe(() => {
-      throw new Error('API Error');
-    }));
+    const errorObservable = new Observable((subscriber) => {
+      subscriber.error(new Error('API Error'));
+    });
+    mockApiService.getTopCoins.mockReturnValue(errorObservable);
 
-    spyOn(console, 'error');
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     component['loadTopCoins']();
     tick();
 

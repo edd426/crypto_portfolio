@@ -14,7 +14,8 @@ const holdingSchema = Joi.object({
 const portfolioSchema = Joi.object({
   holdings: Joi.array().items(holdingSchema).required(),
   cashBalance: Joi.number().min(0).required(),
-  excludedCoins: Joi.array().items(Joi.string()).optional().default([])
+  excludedCoins: Joi.array().items(Joi.string()).optional().default([]),
+  maxCoins: Joi.number().integer().min(1).max(50).optional().default(15)
 });
 
 const rebalanceSchema = Joi.object({
@@ -42,10 +43,13 @@ router.post('/calculate', asyncHandler(async (req: Request, res: Response) => {
   // Use excludedCoins from portfolio if available, otherwise use top-level excludedCoins
   const finalExcludedCoins = portfolio.excludedCoins?.length > 0 ? portfolio.excludedCoins : excludedCoins;
   
+  // Use maxCoins from portfolio if available, otherwise use options.topN (for backward compatibility)
+  const maxCoins = portfolio.maxCoins || options.topN;
+  
   const result = await rebalancingService.calculateRebalancing(
     portfolio,
     finalExcludedCoins,
-    options.topN
+    maxCoins
   );
   
   res.json(result);

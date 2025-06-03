@@ -1,19 +1,27 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Portfolio, RebalanceResult, TradeRecommendation, PortfolioMetrics } from '../../models/portfolio.model';
-import { PortfolioUrlService } from '../../services/portfolio-url.service';
 
 interface ChartDataItem {
   symbol: string;
   value: number;
   percentage: number;
   heightPercent: number; // Height in pixels for chart bar
+}
+
+interface AllocationDataItem {
+  symbol: string;
+  currentPercentage: number;
+  currentValue: number;
+  currentAmount: number;
+  targetPercentage: number;
+  targetValue: number;
+  targetAmount: number;
 }
 
 @Component({
@@ -69,6 +77,7 @@ interface ChartDataItem {
           </mat-card-content>
         </mat-card>
       </div>
+
 
       <!-- Charts and Tables -->
       <mat-tab-group>
@@ -204,20 +213,41 @@ interface ChartDataItem {
           </div>
         </mat-tab>
 
-        <!-- Target Allocations Tab -->
-        <mat-tab label="Target Allocations">
+        <!-- Allocations Tab -->
+        <mat-tab label="Allocations">
           <div class="tab-content">
             <mat-card>
               <mat-card-header>
-                <mat-card-title>Market Cap Weighted Allocations</mat-card-title>
-                <mat-card-subtitle>Based on top 15 cryptocurrencies by market capitalization</mat-card-subtitle>
+                <mat-card-title>Portfolio Allocations</mat-card-title>
+                <mat-card-subtitle>Current vs Target allocations including cash holdings</mat-card-subtitle>
               </mat-card-header>
               <mat-card-content>
-                <table mat-table [dataSource]="result.targetAllocations" class="allocations-table">
+                <table mat-table [dataSource]="getAllocationData()" class="allocations-table">
                   
                   <ng-container matColumnDef="symbol">
                     <th mat-header-cell *matHeaderCellDef>Coin</th>
                     <td mat-cell *matCellDef="let allocation">{{allocation.symbol}}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="currentPercentage">
+                    <th mat-header-cell *matHeaderCellDef>Current %</th>
+                    <td mat-cell *matCellDef="let allocation">
+                      {{allocation.currentPercentage | number:'1.2-2'}}%
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="currentValue">
+                    <th mat-header-cell *matHeaderCellDef>Current Value</th>
+                    <td mat-cell *matCellDef="let allocation">
+                      {{allocation.currentValue | currency:'USD':'symbol':'1.2-2'}}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="currentAmount">
+                    <th mat-header-cell *matHeaderCellDef>Current Amount</th>
+                    <td mat-cell *matCellDef="let allocation">
+                      {{allocation.currentAmount | number:'1.2-6'}}
+                    </td>
                   </ng-container>
 
                   <ng-container matColumnDef="targetPercentage">
@@ -250,13 +280,6 @@ interface ChartDataItem {
         </mat-tab>
       </mat-tab-group>
 
-      <!-- Actions -->
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="generateShareableLink()">
-          <mat-icon>share</mat-icon>
-          Generate Shareable Link
-        </button>
-      </div>
 
       <!-- Tooltip -->
       <div class="chart-tooltip" 
@@ -282,6 +305,7 @@ interface ChartDataItem {
       gap: 16px;
       margin-bottom: 24px;
     }
+
 
     .summary-card {
       text-align: center;
@@ -409,6 +433,29 @@ interface ChartDataItem {
       width: 100%;
     }
 
+    .allocations-table {
+      font-size: 14px;
+    }
+
+    .allocations-table .mat-column-symbol {
+      font-weight: 500;
+    }
+
+    .allocations-table .mat-column-currentPercentage,
+    .allocations-table .mat-column-targetPercentage {
+      text-align: right;
+    }
+
+    .allocations-table .mat-column-currentValue,
+    .allocations-table .mat-column-targetValue {
+      text-align: right;
+    }
+
+    .allocations-table .mat-column-currentAmount,
+    .allocations-table .mat-column-targetAmount {
+      text-align: right;
+    }
+
     .action-buy {
       color: #4caf50;
       font-weight: 500;
@@ -417,12 +464,6 @@ interface ChartDataItem {
     .action-sell {
       color: #f44336;
       font-weight: 500;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 24px;
     }
 
     @media (max-width: 768px) {
@@ -447,7 +488,7 @@ export class RebalancingResultsComponent implements OnInit, OnDestroy {
 
   // Table columns
   tradesDisplayedColumns: string[] = ['symbol', 'action', 'amount', 'usdValue', 'currentHolding', 'targetHolding'];
-  allocationsDisplayedColumns: string[] = ['symbol', 'targetPercentage', 'targetValue', 'targetAmount'];
+  allocationsDisplayedColumns: string[] = ['symbol', 'currentPercentage', 'currentValue', 'currentAmount', 'targetPercentage', 'targetValue', 'targetAmount'];
 
   // Tooltip properties
   tooltipVisible = false;
@@ -455,10 +496,7 @@ export class RebalancingResultsComponent implements OnInit, OnDestroy {
   tooltipY = 0;
   tooltipData: any = {};
 
-  constructor(
-    private portfolioUrlService: PortfolioUrlService,
-    private snackBar: MatSnackBar
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     // Check for debug level in localStorage or URL params
@@ -713,19 +751,87 @@ export class RebalancingResultsComponent implements OnInit, OnDestroy {
     this.tooltipData = {};
   }
 
-  generateShareableLink(): void {
-    const shareableUrl = this.portfolioUrlService.generateShareableUrl(this.portfolio);
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(shareableUrl).then(() => {
-      this.snackBar.open('Shareable link copied to clipboard!', 'Dismiss', {
-        duration: 3000
-      });
-    }).catch(() => {
-      // Fallback for older browsers
-      this.snackBar.open(`Shareable link: ${shareableUrl}`, 'Dismiss', {
-        duration: 10000
+  getAllocationData(): AllocationDataItem[] {
+    if (!this.result || !this.portfolio) return [];
+
+    // Create a map to store combined data
+    const allocationMap = new Map<string, AllocationDataItem>();
+
+    // First, add all target allocations
+    this.result.targetAllocations.forEach(target => {
+      allocationMap.set(target.symbol, {
+        symbol: target.symbol,
+        currentPercentage: 0,
+        currentValue: 0,
+        currentAmount: 0,
+        targetPercentage: target.targetPercentage,
+        targetValue: target.targetValue,
+        targetAmount: target.targetAmount
       });
     });
+
+    // Then, add current holdings data
+    this.portfolio.holdings.forEach(holding => {
+      let currentPrice = 0;
+      let currentValue = 0;
+
+      // Try to get price from target allocations first
+      const targetAllocation = this.result.targetAllocations.find(a => a.symbol === holding.symbol);
+      if (targetAllocation && targetAllocation.targetAmount > 0) {
+        currentPrice = targetAllocation.targetValue / targetAllocation.targetAmount;
+        currentValue = holding.amount * currentPrice;
+      } else {
+        // For excluded coins, get current value from trade data
+        const trade = this.result.trades.find(t => t.symbol === holding.symbol);
+        if (trade) {
+          if (trade.action === 'SELL' && trade.amount === holding.amount) {
+            currentValue = trade.usdValue;
+          } else {
+            currentPrice = trade.usdValue / trade.amount;
+            currentValue = currentPrice * holding.amount;
+          }
+        }
+      }
+
+      const currentPercentage = this.result.currentValue > 0 ? (currentValue / this.result.currentValue) * 100 : 0;
+
+      // Update existing entry or create new one
+      const existing = allocationMap.get(holding.symbol);
+      if (existing) {
+        existing.currentPercentage = currentPercentage;
+        existing.currentValue = currentValue;
+        existing.currentAmount = holding.amount;
+      } else {
+        // This is a holding not in target allocations (excluded coin)
+        allocationMap.set(holding.symbol, {
+          symbol: holding.symbol,
+          currentPercentage: currentPercentage,
+          currentValue: currentValue,
+          currentAmount: holding.amount,
+          targetPercentage: 0,
+          targetValue: 0,
+          targetAmount: 0
+        });
+      }
+    });
+
+    // Add cash as a row
+    if (this.portfolio.cashBalance > 0) {
+      const cashPercentage = (this.portfolio.cashBalance / this.result.currentValue) * 100;
+      allocationMap.set('CASH', {
+        symbol: 'CASH',
+        currentPercentage: cashPercentage,
+        currentValue: this.portfolio.cashBalance,
+        currentAmount: this.portfolio.cashBalance, // For cash, amount = value
+        targetPercentage: 0,
+        targetValue: 0,
+        targetAmount: 0
+      });
+    }
+
+    // Convert to array and sort by current value descending
+    return Array.from(allocationMap.values())
+      .sort((a, b) => b.currentValue - a.currentValue);
   }
+
 }

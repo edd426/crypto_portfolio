@@ -21,6 +21,7 @@ export interface Portfolio {
   holdings: Holding[];
   cashBalance: number;
   excludedCoins: string[];
+  maxCoins?: number; // Maximum number of coins in target portfolio (default: 15)
   totalValue?: number;
   lastUpdated?: Date;
 }

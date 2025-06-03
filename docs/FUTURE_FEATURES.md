@@ -1,9 +1,28 @@
 # Future Features Roadmap
 
+**Last Updated**: June 3, 2025
+
 ## Overview
 This document outlines potential features for future development, organized by priority and complexity. These features extend beyond the core MVP functionality.
 
-## Priority 1: Enhanced User Experience
+## 🚨 **IMMEDIATE PRIORITY: Azure Production Deployment**
+
+**The next developer should focus on robust Azure deployment before implementing new features.**
+
+### Azure Production Deployment (URGENT)
+- **Status**: Ready for implementation
+- **Documentation**: Complete infrastructure planning in `/docs/DEPLOYMENT_INFRASTRUCTURE.md`
+- **Infrastructure**: Terraform configurations for Azure Container Instances, Application Gateway, PostgreSQL
+- **Monitoring**: Azure Application Insights and Log Analytics integration
+- **Security**: Azure Key Vault for secrets management
+- **CI/CD**: GitHub Actions pipeline deployment to Azure
+- **Estimated Effort**: 1-2 weeks for full production deployment
+
+**Note**: All technical planning is complete. The application is production-ready and waiting for Azure deployment.
+
+---
+
+## Priority 1: Post-Deployment Features
 
 ### Multiple Portfolio Management
 - **Description**: Allow users to create and save multiple portfolios

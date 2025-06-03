@@ -52,8 +52,7 @@ describe('PortfolioUrlService', () => {
           queryParams: expect.objectContaining({
             p: 'BTC:0.5,ETH:10',
             cash: '5000',
-            exclude: 'DOGE',
-            t: expect.any(String)
+            exclude: 'DOGE'
           }),
           queryParamsHandling: 'merge'
         })
@@ -72,9 +71,8 @@ describe('PortfolioUrlService', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(
         [],
         expect.objectContaining({
-          queryParams: expect.objectContaining({
-            t: expect.any(String)
-          })
+          queryParams: {},
+          queryParamsHandling: 'merge'
         })
       );
     });
@@ -82,11 +80,14 @@ describe('PortfolioUrlService', () => {
 
   describe('loadPortfolioFromUrl', () => {
     it('should load portfolio from URL parameters', () => {
-      mockActivatedRoute.snapshot!.queryParams = {
-        p: 'BTC:0.5,ETH:10',
-        cash: '5000',
-        exclude: 'DOGE,SHIB'
-      };
+      // Mock window.location.search
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?p=BTC:0.5,ETH:10&cash=5000&exclude=DOGE,SHIB'
+        },
+        writable: true
+      });
 
       const result = service.loadPortfolioFromUrl();
 
@@ -96,12 +97,20 @@ describe('PortfolioUrlService', () => {
           { symbol: 'ETH', amount: 10 }
         ],
         cashBalance: 5000,
-        excludedCoins: ['DOGE', 'SHIB']
+        excludedCoins: ['DOGE', 'SHIB'],
+        maxCoins: 15
       });
     });
 
     it('should return null for empty URL parameters', () => {
-      mockActivatedRoute.snapshot!.queryParams = {};
+      // Mock empty search
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: ''
+        },
+        writable: true
+      });
 
       const result = service.loadPortfolioFromUrl();
 
@@ -109,10 +118,14 @@ describe('PortfolioUrlService', () => {
     });
 
     it('should handle malformed portfolio parameters', () => {
-      mockActivatedRoute.snapshot!.queryParams = {
-        p: 'BTC:invalid,ETH:10',
-        cash: 'invalid'
-      };
+      // Mock search with invalid data
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?p=BTC:invalid,ETH:10&cash=invalid'
+        },
+        writable: true
+      });
 
       const result = service.loadPortfolioFromUrl();
 
@@ -123,9 +136,14 @@ describe('PortfolioUrlService', () => {
     });
 
     it('should filter out invalid holdings', () => {
-      mockActivatedRoute.snapshot!.queryParams = {
-        p: 'BTC:0,ETH:10,:5'
-      };
+      // Mock search with invalid holding data
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          search: '?p=BTC:0,ETH:10,:5'
+        },
+        writable: true
+      });
 
       const result = service.loadPortfolioFromUrl();
 
@@ -162,7 +180,6 @@ describe('PortfolioUrlService', () => {
       expect(result).toContain('p=BTC%3A0.5%2CETH%3A10');
       expect(result).toContain('cash=5000');
       expect(result).toContain('exclude=DOGE');
-      expect(result).toContain('t=');
     });
 
     it('should generate URL without optional parameters', () => {
@@ -174,10 +191,137 @@ describe('PortfolioUrlService', () => {
 
       const result = service.generateShareableUrl(portfolio);
 
-      expect(result).toMatch(/^https:\/\/example\.com\/portfolio\?t=/);
+      expect(result).toBe('https://example.com/portfolio?');
       expect(result).not.toContain('p=');
       expect(result).not.toContain('cash=');
       expect(result).not.toContain('exclude=');
+    });
+
+    describe('maxCoins functionality', () => {
+      it('should include maxCoins in URL when different from default', () => {
+        const portfolio: Portfolio = {
+          holdings: [
+            { symbol: 'BTC', amount: 0.5 }
+          ],
+          cashBalance: 1000,
+          excludedCoins: [],
+          maxCoins: 25
+        };
+
+        service.savePortfolioToUrl(portfolio);
+
+        expect(mockRouter.navigate).toHaveBeenCalledWith([], {
+          relativeTo: mockActivatedRoute,
+          queryParams: expect.objectContaining({
+            p: 'BTC:0.5',
+            cash: '1000',
+            maxCoins: '25'
+          }),
+          queryParamsHandling: 'merge'
+        });
+      });
+
+      it('should not include maxCoins in URL when default value', () => {
+        const portfolio: Portfolio = {
+          holdings: [
+            { symbol: 'BTC', amount: 0.5 }
+          ],
+          cashBalance: 1000,
+          excludedCoins: [],
+          maxCoins: 15
+        };
+
+        service.savePortfolioToUrl(portfolio);
+
+        const params = (mockRouter.navigate as jest.Mock).mock.calls[0][1].queryParams;
+        expect(params.maxCoins).toBeUndefined();
+      });
+
+      it('should load maxCoins from URL parameters', () => {
+        // Mock window.location.search
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...window.location,
+            search: '?p=BTC:0.5,ETH:10&cash=5000&exclude=DOGE,SHIB&maxCoins=20'
+          },
+          writable: true
+        });
+
+        const result = service.loadPortfolioFromUrl();
+
+        expect(result).toEqual({
+          holdings: [
+            { symbol: 'BTC', amount: 0.5 },
+            { symbol: 'ETH', amount: 10 }
+          ],
+          cashBalance: 5000,
+          excludedCoins: ['DOGE', 'SHIB'],
+          maxCoins: 20
+        });
+      });
+
+      it('should default to 15 when maxCoins not in URL', () => {
+        // Mock window.location.search without maxCoins
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...window.location,
+            search: '?p=BTC:0.5&cash=1000'
+          },
+          writable: true
+        });
+
+        const result = service.loadPortfolioFromUrl();
+
+        expect(result?.maxCoins).toBe(15);
+      });
+
+      it('should handle invalid maxCoins values in URL', () => {
+        // Mock window.location.search with invalid maxCoins
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...window.location,
+            search: '?p=BTC:0.5&cash=1000&maxCoins=invalid'
+          },
+          writable: true
+        });
+
+        const result = service.loadPortfolioFromUrl();
+
+        expect(result?.maxCoins).toBe(15); // Should default to 15
+      });
+
+      it('should include maxCoins in shareable URL when different from default', () => {
+        const portfolio: Portfolio = {
+          holdings: [
+            { symbol: 'BTC', amount: 0.5 }
+          ],
+          cashBalance: 1000,
+          excludedCoins: ['USDT'],
+          maxCoins: 30
+        };
+
+        const result = service.generateShareableUrl(portfolio);
+
+        expect(result).toContain('maxCoins=30');
+        expect(result).toContain('p=BTC%3A0.5');
+        expect(result).toContain('cash=1000');
+        expect(result).toContain('exclude=USDT');
+      });
+
+      it('should not include maxCoins in shareable URL when default value', () => {
+        const portfolio: Portfolio = {
+          holdings: [
+            { symbol: 'BTC', amount: 0.5 }
+          ],
+          cashBalance: 1000,
+          excludedCoins: [],
+          maxCoins: 15
+        };
+
+        const result = service.generateShareableUrl(portfolio);
+
+        expect(result).not.toContain('maxCoins');
+      });
     });
   });
 });

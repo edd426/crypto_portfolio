@@ -58,7 +58,7 @@ describe('ApiService', () => {
 
       service.getTopCoins(15, ['DOGE', 'SHIB']).subscribe();
 
-      const req = httpMock.expectOne('http://localhost:3001/api/v1/market/top-coins?limit=15&exclude=DOGE%2CSHIB');
+      const req = httpMock.expectOne('http://localhost:3001/api/v1/market/top-coins?limit=15&exclude=DOGE,SHIB');
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
@@ -78,7 +78,7 @@ describe('ApiService', () => {
         expect(response.data['ETH'].price).toBe(3000);
       });
 
-      const req = httpMock.expectOne('http://localhost:3001/api/v1/market/prices?symbols=BTC%2CETH');
+      const req = httpMock.expectOne('http://localhost:3001/api/v1/market/prices?symbols=BTC,ETH');
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });

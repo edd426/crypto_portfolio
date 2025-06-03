@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -42,7 +42,8 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
       <app-portfolio-entry 
         [initialPortfolio]="initialPortfolio"
         (portfolioSubmitted)="onPortfolioSubmitted($event)"
-        (portfolioChanged)="onPortfolioChanged($event)">
+        (portfolioChanged)="onPortfolioChanged($event)"
+        (generateUrl)="onGenerateUrlFromEntry($event)">
       </app-portfolio-entry>
 
       <div *ngIf="isCalculating" class="text-center mt-2">
@@ -79,6 +80,8 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
   `]
 })
 export class AppComponent implements OnInit {
+  @ViewChild(PortfolioEntryComponent) portfolioEntryComponent!: PortfolioEntryComponent;
+  
   initialPortfolio: Portfolio | null = null;
   currentPortfolio: Portfolio | null = null;
   rebalanceResult: RebalanceResult | null = null;
@@ -119,7 +122,7 @@ export class AppComponent implements OnInit {
 
   onPortfolioChanged(portfolio: Portfolio): void {
     this.currentPortfolio = portfolio;
-    this.portfolioUrlService.savePortfolioToUrl(portfolio);
+    // Remove automatic URL updates - only update when user explicitly generates URL
   }
 
   onPortfolioSubmitted(portfolio: Portfolio): void {
@@ -131,10 +134,36 @@ export class AppComponent implements OnInit {
     this.isCalculating = true;
     this.rebalanceResult = null;
 
-    this.apiService.calculateRebalancing(portfolio).subscribe({
+    // First get the top coins to determine which exclusions are effective
+    const maxCoins = portfolio.maxCoins || 15;
+    
+    this.apiService.calculateRebalancing(
+      portfolio, 
+      portfolio.excludedCoins, 
+      maxCoins
+    ).subscribe({
       next: (result) => {
         this.rebalanceResult = result;
         this.isCalculating = false;
+        
+        // Get top coins without exclusions to determine effective vs ineffective exclusions
+        this.apiService.getTopCoins(maxCoins, []).subscribe({
+          next: (topCoinsResponse) => {
+            const allTopCoins = topCoinsResponse.data.map(coin => coin.symbol);
+            if (this.portfolioEntryComponent) {
+              this.portfolioEntryComponent.updateTopPortfolioCoins(allTopCoins);
+            }
+          },
+          error: (error) => {
+            console.error('Failed to get top coins for exclusion feedback:', error);
+            // Fallback to using target allocations 
+            const topPortfolioCoins = result.targetAllocations.map(allocation => allocation.symbol);
+            if (this.portfolioEntryComponent) {
+              this.portfolioEntryComponent.updateTopPortfolioCoins(topPortfolioCoins);
+            }
+          }
+        });
+        
         this.snackBar.open('Rebalancing calculation completed!', 'Dismiss', {
           duration: 3000
         });
@@ -142,11 +171,47 @@ export class AppComponent implements OnInit {
       error: (error) => {
         this.isCalculating = false;
         console.error('Rebalancing calculation failed:', error);
-        this.snackBar.open('Failed to calculate rebalancing. Please try again.', 'Dismiss', {
-          duration: 5000,
+        
+        // Extract specific error message from the backend
+        let errorMessage = 'Failed to calculate rebalancing. Please try again.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        // Determine snackbar duration based on error type
+        const duration = errorMessage.includes('rate limit') ? 10000 : 5000;
+        
+        this.snackBar.open(errorMessage, 'Dismiss', {
+          duration,
           panelClass: 'error-snackbar'
         });
       }
     });
+  }
+
+  onGenerateUrlFromEntry(portfolio: Portfolio): void {
+    this.generatePortfolioUrl(portfolio);
+  }
+
+
+  private generatePortfolioUrl(portfolio: Portfolio): void {
+    const shareableUrl = this.portfolioUrlService.generateShareableUrl(portfolio);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareableUrl).then(() => {
+      this.snackBar.open('Portfolio URL copied to clipboard!', 'Dismiss', {
+        duration: 3000
+      });
+    }).catch(() => {
+      // Fallback for older browsers
+      this.snackBar.open(`Portfolio URL: ${shareableUrl}`, 'Dismiss', {
+        duration: 10000
+      });
+    });
+
+    // Also update the current URL
+    this.portfolioUrlService.savePortfolioToUrl(portfolio);
   }
 }

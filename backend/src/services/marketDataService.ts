@@ -15,20 +15,25 @@ export class MarketDataService {
     }
 
     try {
+      // Fetch more coins to account for exclusions, but final result should respect the limit
+      // If we want max 15 coins and exclude 2, we should get 13 coins (not 15)
+      const fetchLimit = Math.max(limit + exclude.length, 50); // Fetch enough to filter
+      
       const response = await axios.get(`${this.baseURL}/coins/markets`, {
         params: {
           vs_currency: 'usd',
           order: 'market_cap_desc',
-          per_page: limit + exclude.length,
+          per_page: fetchLimit,
           page: 1,
           sparkline: false,
           price_change_percentage: '24h'
         }
       });
 
-      const coins: Coin[] = response.data
+      // Get the top `limit` coins by market cap, then exclude the specified coins
+      const topLimitCoins = response.data.slice(0, limit);
+      const coins: Coin[] = topLimitCoins
         .filter((coin: any) => !exclude.includes(coin.symbol.toUpperCase()))
-        .slice(0, limit)
         .map((coin: any, index: number) => ({
           rank: index + 1,
           symbol: coin.symbol.toUpperCase(),
@@ -41,9 +46,32 @@ export class MarketDataService {
 
       this.cache.set(cacheKey, coins);
       return coins;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching top coins:', error);
-      throw new Error('Failed to fetch market data');
+      
+      // Handle specific error types
+      if (error.response) {
+        const status = error.response.status;
+        const retryAfter = error.response.headers['retry-after'];
+        
+        switch (status) {
+          case 429:
+            const retryMessage = retryAfter 
+              ? `API rate limit exceeded. Please try again in ${retryAfter} seconds.`
+              : 'API rate limit exceeded. Please try again later.';
+            throw new Error(retryMessage);
+          case 500:
+          case 502:
+          case 503:
+            throw new Error('API server error. Please try again later.');
+          default:
+            throw new Error(`API error (${status}). Please try again later.`);
+        }
+      } else if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else {
+        throw new Error('Failed to fetch market data. Please try again later.');
+      }
     }
   }
 
@@ -99,9 +127,32 @@ export class MarketDataService {
 
       this.cache.set(cacheKey, prices);
       return prices;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching coin prices:', error);
-      throw new Error('Failed to fetch coin prices');
+      
+      // Handle specific error types
+      if (error.response) {
+        const status = error.response.status;
+        const retryAfter = error.response.headers['retry-after'];
+        
+        switch (status) {
+          case 429:
+            const retryMessage = retryAfter 
+              ? `API rate limit exceeded. Please try again in ${retryAfter} seconds.`
+              : 'API rate limit exceeded. Please try again later.';
+            throw new Error(retryMessage);
+          case 500:
+          case 502:
+          case 503:
+            throw new Error('API server error. Please try again later.');
+          default:
+            throw new Error(`API error (${status}). Please try again later.`);
+        }
+      } else if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else {
+        throw new Error('Failed to fetch coin prices. Please try again later.');
+      }
     }
   }
 
@@ -118,9 +169,32 @@ export class MarketDataService {
           name: coin.name,
           logo: coin.thumb
         }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error searching coins:', error);
-      throw new Error('Failed to search coins');
+      
+      // Handle specific error types
+      if (error.response) {
+        const status = error.response.status;
+        const retryAfter = error.response.headers['retry-after'];
+        
+        switch (status) {
+          case 429:
+            const retryMessage = retryAfter 
+              ? `API rate limit exceeded. Please try again in ${retryAfter} seconds.`
+              : 'API rate limit exceeded. Please try again later.';
+            throw new Error(retryMessage);
+          case 500:
+          case 502:
+          case 503:
+            throw new Error('API server error. Please try again later.');
+          default:
+            throw new Error(`API error (${status}). Please try again later.`);
+        }
+      } else if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else {
+        throw new Error('Failed to search coins. Please try again later.');
+      }
     }
   }
 }
