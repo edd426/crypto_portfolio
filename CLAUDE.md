@@ -2,11 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Status: ✅ FULLY FUNCTIONAL MVP + ENHANCED UI
+## Project Status: ✅ FULLY FUNCTIONAL MVP + AZURE INFRASTRUCTURE DEPLOYED
 
-**Last Updated**: June 3, 2025  
-**Current Phase**: Phase 1 MVP Complete + Enhanced UI & Features  
-**Status**: Production-ready with advanced portfolio management features
+**Last Updated**: December 6, 2024  
+**Current Phase**: Phase 1 MVP Complete + Azure Infrastructure Deployed  
+**Status**: Production-ready application with Azure hosting infrastructure
 
 ### 🎯 What Works Now
 - ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance with manual text exclusion
@@ -22,6 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage + rate limiting tests
 - ✅ **CI/CD Pipeline**: GitHub Actions with automated testing and linting
 - ✅ **Debug System**: Configurable verbosity levels for troubleshooting
+- ✅ **Azure Infrastructure**: Static Web App deployed with monitoring and cost controls
 
 ### 🚀 How to Start Development
 ```bash
@@ -32,6 +33,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd backend && npm start    # Backend: http://localhost:3001
 cd frontend && npm start   # Frontend: http://localhost:4200
 ```
+
+## ☁️ Azure Infrastructure Status
+
+### ✅ Successfully Deployed (December 6, 2024)
+- **Static Web App**: `stapp-cryptoportfolio-prod-9rc2a6`
+- **Live URL**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net
+- **Resource Group**: `rg-cryptoportfolio-prod-9rc2a6`
+- **Application Insights**: Monitoring enabled
+- **Budget Alerts**: $25/month with email notifications to eddelord@gmail.com
+- **Monthly Cost**: ~$0-5 (FREE tier infrastructure)
+
+### ⚠️ Known Limitations
+- **Azure Functions**: Blocked by quota limitations (Dynamic VMs: 0 quota)
+- **Backend**: Not deployed to Azure due to quota restrictions
+
+### 🛠️ Infrastructure Details
+- **Location**: West US 2
+- **Terraform**: Infrastructure as Code in `/infrastructure/environments/production-simple/`
+- **Resource Providers**: All registered and functional
+- **Monitoring**: Application Insights + budget controls active
 
 ## Project Overview
 
@@ -326,42 +347,56 @@ npm run test:coverage       # With coverage reports
 
 ## 🚀 Next Development Priority
 
-### 🎯 **IMMEDIATE FOCUS: Azure Production Deployment**
+### 🎯 **IMMEDIATE FOCUS: Frontend Deployment & Backend Decision**
 
-**The application is production-ready and the next developer should prioritize robust Azure deployment.**
+**Azure infrastructure is deployed. The next developer must choose a backend strategy and deploy the frontend.**
 
-#### Priority 1: Azure Production Deployment (URGENT)
-- [ ] **Deploy to Azure** using existing infrastructure planning in `/docs/DEPLOYMENT_INFRASTRUCTURE.md`
-- [ ] Set up Azure Container Instances with Terraform configurations
-- [ ] Configure Azure Application Gateway for load balancing and SSL
-- [ ] Implement Azure Database for PostgreSQL for portfolio persistence
-- [ ] Set up Azure Application Insights for monitoring and logging
-- [ ] Configure Azure Key Vault for secrets management
-- [ ] Deploy CI/CD pipeline using existing GitHub Actions
+#### Priority 1: Frontend Deployment (URGENT)
+- [ ] **Deploy frontend to Azure Static Web App** using the deployed infrastructure
+- [ ] **Use GitHub Actions** to deploy Angular build to `https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net`
+- [ ] **Set up CI/CD pipeline** for automatic frontend deployment
+- [ ] **Test deployment** and verify functionality
 
-#### Priority 2: Post-Deployment Optimization
-- [ ] Add Azure Cache for Redis for improved performance
-- [ ] Implement auto-scaling policies
-- [ ] Set up automated backups and disaster recovery
-- [ ] Configure custom domain and SSL certificates
-- [ ] Optimize Azure costs and resource allocation
+#### Priority 2: Backend Strategy Decision (CRITICAL)
+Choose ONE of the following approaches:
 
-#### Priority 3: Phase 2 Features (After Production Deployment)
+**Option A: Client-Side Only (RECOMMENDED - Zero Cost)**
+- [ ] **Modify frontend** to call CoinGecko API directly from browser
+- [ ] **Remove backend dependency** completely
+- [ ] **Implement client-side rebalancing calculations**
+- [ ] **Handle CORS and rate limiting** in frontend
+- **Pros**: Zero backend costs, immediate deployment, no quota issues
+- **Cons**: API key exposure (use free tier), no server-side caching
+
+**Option B: Alternative Serverless Backend**
+- [ ] **Deploy backend to Vercel/Netlify/Railway** (better free tiers)
+- [ ] **Update frontend API_URL** to point to new backend
+- [ ] **Migrate Terraform state** if staying with Azure later
+- **Pros**: Keep existing backend code, server-side caching
+- **Cons**: Additional platform setup, potential costs
+
+**Option C: Resolve Azure Functions Quota**
+- [ ] **Request quota increase** through Azure Support
+- [ ] **Wait for approval** (24-48 hours typically)
+- [ ] **Deploy backend using existing Terraform** in `/infrastructure/environments/production/`
+- **Pros**: Complete Azure solution, enterprise-ready
+- **Cons**: Uncertain timeline, potential denial
+
+#### Priority 3: Post-Deployment Optimization
+- [ ] **Set up custom domain** for production URL
+- [ ] **Configure SSL certificates**
+- [ ] **Implement monitoring alerts**
+- [ ] **Optimize for mobile devices**
+- [ ] **Add performance monitoring**
+
+#### Priority 4: Phase 2 Features
 - [ ] Historical backtesting with date range selection
 - [ ] Multiple rebalancing frequencies (daily, weekly, monthly)
 - [ ] Performance metrics calculation (Sharpe ratio, max drawdown)
 - [ ] Transaction cost modeling and optimization
-- [ ] Portfolio comparison and analytics
 - [ ] Export functionality (CSV, PDF reports)
 
-#### Priority 4: UI/UX Enhancements
-- [ ] Add portfolio visualization charts
-- [ ] Implement responsive mobile design
-- [ ] Add dark mode toggle
-- [ ] Portfolio simulation and "what-if" scenarios
-- [ ] Improve loading states and animations
-
-**Note**: All Azure infrastructure planning and Terraform configurations are already documented in `/docs/DEPLOYMENT_INFRASTRUCTURE.md`. The application is fully ready for production deployment.
+**RECOMMENDATION**: Choose Option A (client-side only) for fastest deployment and lowest cost. The existing backend adds minimal value over direct API calls for an MVP.
 
 ## Development Guidelines
 

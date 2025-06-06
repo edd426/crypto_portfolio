@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+# Azure region (East US is typically cheapest)
+location = "East US"
+
+# CoinGecko API key (optional - leave empty for free tier)
+# Get from: https://www.coingecko.com/en/api/pricing
+coingecko_api_key = ""
+
+# Budget settings
+monthly_budget = 25  # USD - conservative for minimal cost setup
+
+# Email addresses for budget alerts (REQUIRED)
+budget_alert_emails = [
+  "your-email@example.com"
+]
