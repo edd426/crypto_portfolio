@@ -1,23 +1,33 @@
 # Technical Architecture & API Documentation
 
+**Last Updated**: June 7, 2025  
+**Status**: Architecture finalized - client-side optimized design
+
 ## System Architecture
 
-### High-Level Architecture
+### FINALIZED High-Level Architecture
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│                 │     │                  │     │                 │
-│  Angular SPA    │────▶│  Azure Functions │────▶│ External APIs   │
-│  (Static Host)  │     │  (Serverless)    │     │ (CoinGecko)     │
-│                 │     │                  │     │                 │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-         │                       │
-         │                       │
-         ▼                       ▼
-┌─────────────────┐     ┌──────────────────┐
-│  Azure CDN      │     │  Azure Redis     │
-│  (Static Assets)│     │  (Cache Layer)   │
-└─────────────────┘     └──────────────────┘
+┌─────────────────┐                    ┌─────────────────┐
+│                 │ Direct HTTP calls  │                 │
+│  Angular SPA    │───────────────────▶│ External APIs   │
+│  (Static Host)  │                    │ (CoinGecko)     │
+│                 │                    │                 │
+└─────────────────┘                    └─────────────────┘
+         │                                       │
+         │ Fetch historical data                 │ Monthly updates
+         ▼                                       ▼
+┌─────────────────┐     ┌──────────────────┐    ┌──────────────────┐
+│  Azure CDN      │     │ Azure Blob       │◀───│ Azure Functions  │
+│  (Static Assets)│     │ Storage (Public) │    │ (Data Updates)   │
+└─────────────────┘     └──────────────────┘    └──────────────────┘
 ```
+
+### Architecture Changes (June 7, 2025)
+- **✅ ELIMINATED**: Azure Redis Cache (99% cost reduction)
+- **✅ ELIMINATED**: Azure Functions for computation (client-side instead)
+- **✅ SIMPLIFIED**: Direct browser-to-CoinGecko API calls for Phase 1
+- **✅ OPTIMIZED**: Azure Blob Storage with public read access
+- **✅ MINIMIZED**: Single monthly Azure Function for data updates only
 
 ### Technology Stack Details
 

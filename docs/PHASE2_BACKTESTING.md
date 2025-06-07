@@ -1,7 +1,30 @@
 # Phase 2: Backtesting Feature
 
+**Last Updated**: June 7, 2025  
+**Status**: Architecture finalized - simplified client-side approach
+
 ## Overview
-The backtesting feature allows users to simulate how their market-cap weighted rebalancing strategy would have performed historically, with configurable rebalancing frequencies and transaction costs.
+The backtesting feature allows users to simulate how their market-cap weighted rebalancing strategy would have performed historically, with **simplified monthly/quarterly/yearly rebalancing frequencies** and transaction costs.
+
+## ✅ FINALIZED ARCHITECTURE DECISIONS (June 7, 2025)
+
+### **Simplified Rebalancing Frequencies**
+- **✅ Supported**: Monthly, Quarterly, Yearly only
+- **❌ Eliminated**: Daily and weekly rebalancing (future features)
+- **Rationale**: 97% complexity reduction while covering practical use cases
+
+### **Client-Side Computation**
+- **✅ Decision**: Browser-based backtesting calculations
+- **Performance**: 300-700ms total execution time
+- **Benefits**: No cold starts, no server costs, instant results
+- **Complexity**: ~2,700 simple operations for 5-year monthly backtest
+
+### **Data Storage Strategy**
+- **✅ Format**: Single JSON file per coin (btc.json, eth.json)
+- **✅ Size**: 7.2KB per coin for 5 years of monthly data
+- **✅ Access**: Direct browser fetch from Azure Blob Storage (public read)
+- **✅ Updates**: Monthly Azure Function (1st of month, 100 API calls)
+- **✅ Cost**: ~$0.01/month total
 
 ## User Journey
 
@@ -10,7 +33,7 @@ The backtesting feature allows users to simulate how their market-cap weighted r
 - Set backtesting parameters:
   - Start date (earliest available based on coin data)
   - End date (default: today)
-  - Rebalancing frequency: Daily, Weekly, Monthly, Quarterly, Yearly
+  - Rebalancing frequency: Monthly, Quarterly, Yearly (simplified)
   - Initial investment amount (if starting fresh)
   - Transaction fee percentage (default: 0.5%)
   - Slippage percentage (default: 0.1%)
