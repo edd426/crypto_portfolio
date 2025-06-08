@@ -87,7 +87,11 @@ resource "azurerm_storage_account" "historical_data" {
     cors_rule {
       allowed_headers    = ["*"]
       allowed_methods    = ["GET", "HEAD", "OPTIONS"]
-      allowed_origins    = ["*"]  # Will be restricted to your domain in production
+      allowed_origins    = [
+        "https://${azurerm_static_web_app.main.default_host_name}",
+        "http://localhost:4200",
+        "https://localhost:4200"
+      ]
       exposed_headers    = ["*"]
       max_age_in_seconds = 3600
     }
@@ -101,6 +105,57 @@ resource "azurerm_storage_container" "crypto_data" {
   name                  = "historical-data"
   storage_account_name  = azurerm_storage_account.historical_data.name
   container_access_type = "blob"  # Public read access for individual blobs
+}
+
+# Service Plan for Azure Function (Consumption Y1)
+resource "azurerm_service_plan" "function_plan" {
+  name                = "plan-func-${local.resource_prefix}"
+  resource_group_name = azurerm_resource_group.main.name
+  location           = azurerm_resource_group.main.location
+  os_type            = "Linux"
+  sku_name           = "Y1"  # Consumption plan (pay-per-execution)
+  
+  tags = local.common_tags
+}
+
+# Function App for historical data updates
+resource "azurerm_linux_function_app" "historical_data_updater" {
+  name                = "func-${local.resource_prefix}"
+  resource_group_name = azurerm_resource_group.main.name
+  location           = azurerm_resource_group.main.location
+  
+  service_plan_id            = azurerm_service_plan.function_plan.id
+  storage_account_name       = azurerm_storage_account.historical_data.name
+  storage_account_access_key = azurerm_storage_account.historical_data.primary_access_key
+  
+  site_config {
+    application_stack {
+      node_version = "18"
+    }
+    
+    # CORS configuration
+    cors {
+      allowed_origins = [
+        "https://${azurerm_static_web_app.main.default_host_name}",
+        "http://localhost:4200"
+      ]
+      support_credentials = false
+    }
+  }
+  
+  app_settings = {
+    "FUNCTIONS_WORKER_RUNTIME"     = "node"
+    "WEBSITE_NODE_DEFAULT_VERSION" = "~18"
+    "AZURE_STORAGE_CONNECTION_STRING" = azurerm_storage_account.historical_data.primary_connection_string
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.main.instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.main.connection_string
+    
+    # Function app specific settings
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING" = azurerm_storage_account.historical_data.primary_connection_string
+    "WEBSITE_CONTENTSHARE" = "func-${local.resource_prefix}"
+  }
+  
+  tags = local.common_tags
 }
 
 # Application Insights (FREE tier)

@@ -51,11 +51,25 @@
 - URL-based portfolio persistence
 - Comprehensive error handling
 
-## 📊 AZURE RESOURCES
-- **Static Web App**: `stapp-cryptoportfolio-prod-9rc2a6`
-- **Storage Account**: `stcrypto9rc2a6`
+## 📊 AZURE INFRASTRUCTURE
+
+### Active Resources
+- **Static Web App**: `stapp-cryptoportfolio-prod-9rc2a6` (FREE tier)
+- **Storage Account**: `stcrypto9rc2a6` (Blob Storage - ready for Phase 2)
 - **Resource Group**: `rg-cryptoportfolio-prod-9rc2a6`
+- **Application Insights**: Monitoring enabled
 - **Location**: West US 2
+
+### Cost Optimization Achieved
+- **Original Plan**: $50-100/month (Redis + Functions + API Management)
+- **Current Cost**: $0/month (99%+ reduction)
+- **Phase 2 Target**: $0.01/month (minimal Function for data updates)
+
+### Infrastructure Decisions
+- **✅ ELIMINATED**: Redis Cache, API Management, Key Vault
+- **✅ SIMPLIFIED**: Single Static Web App + Blob Storage
+- **✅ OPTIMIZED**: Client-side computation, direct API calls
+- **✅ READY**: Phase 2 infrastructure configured
 
 ## 🧪 TESTING STATUS
 - **Coverage**: 70%+ maintained

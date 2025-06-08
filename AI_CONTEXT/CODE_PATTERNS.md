@@ -299,3 +299,144 @@ private debugLog(level: number, message: string, data?: any): void {
   }
 }
 ```
+
+## 🌐 API Response Patterns
+
+### Standard Response Format
+```typescript
+interface ApiResponse<T> {
+  data: T;
+  timestamp: string;
+  cached: boolean;
+  metadata?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+}
+```
+
+### Error Response Format
+```typescript
+interface ErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+  requestId: string;
+  timestamp: string;
+}
+
+// Common error codes
+enum ApiErrorCode {
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  NOT_FOUND = 'NOT_FOUND', 
+  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+  EXTERNAL_API_ERROR = 'EXTERNAL_API_ERROR',
+  INTERNAL_ERROR = 'INTERNAL_ERROR'
+}
+```
+
+### API Integration Patterns
+```typescript
+// CoinGecko market data
+interface CoinGeckoResponse {
+  rank: number;
+  symbol: string;
+  name: string;
+  price: number;
+  marketCap: number;
+  change24h: number;
+  volume24h: number;
+}
+
+// Portfolio calculation response
+interface RebalanceResponse {
+  currentValue: number;
+  totalValue: number;
+  targetAllocations: Allocation[];
+  trades: Trade[];
+  summary: {
+    totalBuys: number;
+    totalSells: number;
+    estimatedFees: number;
+  };
+  metadata: {
+    timestamp: string;
+    excludedCoins: string[];
+    maxCoins: number;
+  };
+}
+```
+
+## 📊 Performance Patterns
+
+### Cache Headers Pattern
+```typescript
+// Set appropriate cache headers for API responses
+const setCacheHeaders = (response: Response, ttl: number) => {
+  response.headers.set('Cache-Control', `public, max-age=${ttl}`);
+  response.headers.set('ETag', generateETag(response.body));
+  response.headers.set('Last-Modified', new Date().toUTCString());
+};
+```
+
+### Rate Limiting Pattern
+```typescript
+interface RateLimitHeaders {
+  'X-RateLimit-Limit': string;
+  'X-RateLimit-Remaining': string;
+  'X-RateLimit-Reset': string;
+}
+
+const handleRateLimit = (error: HttpErrorResponse): string => {
+  if (error.status === 429) {
+    const retryAfter = error.headers.get('retry-after');
+    if (retryAfter) {
+      return `Rate limit exceeded. Please try again in ${retryAfter} seconds.`;
+    }
+    return 'Rate limit exceeded. Please try again in a few minutes.';
+  }
+  return 'An unexpected error occurred.';
+};
+```
+
+## 🔐 Security Patterns
+
+### CORS Configuration
+```typescript
+const corsOptions = {
+  origin: [
+    'https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net',
+    'http://localhost:4200'
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'X-Requested-With'],
+  credentials: false // No authentication required
+};
+```
+
+### Input Validation Pattern
+```typescript
+import Joi from 'joi';
+
+const portfolioSchema = Joi.object({
+  holdings: Joi.array().items(
+    Joi.object({
+      symbol: Joi.string().uppercase().required(),
+      amount: Joi.number().positive().required()
+    })
+  ).required(),
+  cashBalance: Joi.number().min(0).required(),
+  maxCoins: Joi.number().integer().min(1).max(50).default(15)
+});
+
+const validateRequest = (data: any, schema: Joi.Schema) => {
+  const { error, value } = schema.validate(data);
+  if (error) {
+    throw new ValidationError(error.details[0].message);
+  }
+  return value;
+};
+```

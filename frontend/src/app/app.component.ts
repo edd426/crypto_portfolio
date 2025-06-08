@@ -4,9 +4,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { PortfolioEntryComponent } from './components/portfolio-entry/portfolio-entry.component';
 import { RebalancingResultsComponent } from './components/rebalancing-results/rebalancing-results.component';
+import { BacktestingComponent } from './components/backtesting/backtesting.component';
 import { Portfolio, RebalanceResult } from './models/portfolio.model';
 import { ApiService } from './services/api.service';
 import { PortfolioUrlService } from './services/portfolio-url.service';
@@ -19,8 +21,10 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
     MatToolbarModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatTabsModule,
     PortfolioEntryComponent,
-    RebalancingResultsComponent
+    RebalancingResultsComponent,
+    BacktestingComponent
   ],
   template: `
     <mat-toolbar color="primary">
@@ -32,30 +36,42 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
     <div class="container">
       <mat-card class="intro-card">
         <mat-card-header>
-          <mat-card-title>Portfolio Rebalancing Tool</mat-card-title>
+          <mat-card-title>Crypto Portfolio Analyzer</mat-card-title>
           <mat-card-subtitle>
-            Rebalance your crypto portfolio according to market capitalization of the top 15 cryptocurrencies
+            Advanced portfolio rebalancing and backtesting tools for cryptocurrency investments
           </mat-card-subtitle>
         </mat-card-header>
       </mat-card>
 
-      <app-portfolio-entry 
-        [initialPortfolio]="initialPortfolio"
-        (portfolioSubmitted)="onPortfolioSubmitted($event)"
-        (portfolioChanged)="onPortfolioChanged($event)"
-        (generateUrl)="onGenerateUrlFromEntry($event)">
-      </app-portfolio-entry>
+      <mat-tab-group>
+        <mat-tab label="Portfolio Analysis">
+          <div class="tab-content">
+            <app-portfolio-entry 
+              [initialPortfolio]="initialPortfolio"
+              (portfolioSubmitted)="onPortfolioSubmitted($event)"
+              (portfolioChanged)="onPortfolioChanged($event)"
+              (generateUrl)="onGenerateUrlFromEntry($event)">
+            </app-portfolio-entry>
 
-      <div *ngIf="isCalculating" class="text-center mt-2">
-        <mat-spinner></mat-spinner>
-        <p>Calculating rebalancing recommendations...</p>
-      </div>
+            <div *ngIf="isCalculating" class="text-center mt-2">
+              <mat-spinner></mat-spinner>
+              <p>Calculating rebalancing recommendations...</p>
+            </div>
 
-      <app-rebalancing-results 
-        *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
-        [result]="rebalanceResult"
-        [portfolio]="currentPortfolio">
-      </app-rebalancing-results>
+            <app-rebalancing-results 
+              *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
+              [result]="rebalanceResult"
+              [portfolio]="currentPortfolio">
+            </app-rebalancing-results>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Historical Backtesting">
+          <div class="tab-content">
+            <app-backtesting></app-backtesting>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
   `,
   styles: [`
@@ -76,6 +92,10 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
       max-width: 1200px;
       margin: 0 auto;
       padding: 24px;
+    }
+
+    .tab-content {
+      padding: 20px 0;
     }
   `]
 })

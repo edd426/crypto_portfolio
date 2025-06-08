@@ -6,7 +6,7 @@
 ## Overview
 The backtesting feature allows users to simulate how their market-cap weighted rebalancing strategy would have performed historically, with **simplified monthly/quarterly/yearly rebalancing frequencies** and transaction costs.
 
-## ✅ FINALIZED ARCHITECTURE DECISIONS (June 7, 2025)
+## ✅ FINALIZED ARCHITECTURE DECISIONS (June 8, 2025)
 
 ### **Simplified Rebalancing Frequencies**
 - **✅ Supported**: Monthly, Quarterly, Yearly only
@@ -17,14 +17,63 @@ The backtesting feature allows users to simulate how their market-cap weighted r
 - **✅ Decision**: Browser-based backtesting calculations
 - **Performance**: 300-700ms total execution time
 - **Benefits**: No cold starts, no server costs, instant results
-- **Complexity**: ~2,700 simple operations for 5-year monthly backtest
+- **Complexity**: ~2,700 simple operations for complete historical backtest
 
 ### **Data Storage Strategy**
 - **✅ Format**: Single JSON file per coin (btc.json, eth.json)
-- **✅ Size**: 7.2KB per coin for 5 years of monthly data
+- **✅ Size**: 7-15KB per coin (complete historical data from inception)
 - **✅ Access**: Direct browser fetch from Azure Blob Storage (public read)
 - **✅ Updates**: Monthly Azure Function (1st of month, 100 API calls)
 - **✅ Cost**: ~$0.01/month total
+
+## 🎯 PHASE 2 FEATURE REQUIREMENTS (June 8, 2025)
+
+### **MUST-HAVE Features** (Core MVP)
+
+#### **Data Collection & Storage**
+1. **Monthly Historical Data Fetching** - Azure Function to collect monthly price/market cap data from CoinGecko
+2. **Complete Historical Backfill** - One-time population of complete historical data for top 100 coins (from coin inception to present)
+3. **Single JSON File Per Coin** - Store complete history in optimized format (estimated: 7-15KB each depending on coin age)
+4. **Basic Data Validation** - Ensure price/market cap data integrity before storage
+5. **Azure Blob Storage Setup** - Public read access with CORS for browser fetching
+
+#### **Client-Side Backtesting Engine**
+6. **Portfolio Value Calculation** - Track total value over time with rebalancing
+7. **Monthly/Quarterly/Yearly Rebalancing** - Core rebalancing frequency options
+8. **Basic Performance Metrics** - Total return, annualized return, volatility
+9. **Transaction Cost Modeling** - Configurable fee structure (default 0.5%)
+10. **Historical Data Fetching** - Parallel download of required coin data files
+
+#### **Infrastructure & Reliability**
+11. **Error Handling** - Graceful failures for missing data or API issues
+12. **Rate Limiting Compliance** - Stay within CoinGecko free tier limits
+13. **Cost Monitoring** - Ensure $0.01/month target compliance
+
+### **NICE-TO-HAVE Features** (Enhancements)
+
+#### **Advanced Analytics**
+14. **Sharpe Ratio Calculation** - Risk-adjusted return metrics
+15. **Maximum Drawdown** - Peak-to-trough decline measurement
+16. **Correlation Analysis** - Asset correlation over time
+17. **Benchmark Comparison** - Compare against BTC, ETH, or market indices
+
+#### **User Experience**
+18. **Performance Visualization** - Charts showing portfolio growth over time
+19. **Custom Date Range Selection** - User-defined backtesting periods
+20. **Results Caching** - Cache backtesting results for faster re-runs
+21. **Progress Indicators** - Show data loading and calculation progress
+22. **Export Results** - Download backtesting data as CSV/JSON
+
+#### **Data Quality & Monitoring**
+23. **Data Completeness Checks** - Identify and flag missing historical periods
+24. **Azure Function Monitoring** - Application Insights integration
+25. **Data Versioning** - Track data updates and changes
+26. **Automated Alerts** - Email notifications for data collection failures
+
+### **Implementation Priority Order**
+1. **Sprint 1** (Week 1): Features #1-5, #11-13 - Core data pipeline
+2. **Sprint 2** (Week 2): Features #6-10, #18 - Backtesting engine
+3. **Sprint 3** (Week 3): Features #14-17, #19-22 - Enhanced analytics
 
 ## User Journey
 

@@ -1,99 +1,116 @@
-# Technical Architecture & API Documentation
+# API Reference & Technical Specifications
 
-**Last Updated**: June 7, 2025  
-**Status**: Architecture finalized - client-side optimized design
+**Last Updated**: June 8, 2025  
+**Status**: Client-side architecture with direct CoinGecko integration
 
-## System Architecture
+> **Note**: For code patterns and implementation details, see `AI_CONTEXT/CODE_PATTERNS.md`
 
-### FINALIZED High-Level Architecture
+## Current Architecture Overview
+
 ```
 ┌─────────────────┐                    ┌─────────────────┐
-│                 │ Direct HTTP calls  │                 │
-│  Angular SPA    │───────────────────▶│ External APIs   │
-│  (Static Host)  │                    │ (CoinGecko)     │
-│                 │                    │                 │
+│  Angular SPA    │───────────────────▶│ CoinGecko API   │
+│  (Static Host)  │  Direct HTTP       │ (Free Tier)     │
 └─────────────────┘                    └─────────────────┘
-         │                                       │
-         │ Fetch historical data                 │ Monthly updates
-         ▼                                       ▼
-┌─────────────────┐     ┌──────────────────┐    ┌──────────────────┐
-│  Azure CDN      │     │ Azure Blob       │◀───│ Azure Functions  │
-│  (Static Assets)│     │ Storage (Public) │    │ (Data Updates)   │
-└─────────────────┘     └──────────────────┘    └──────────────────┘
+         │                                      
+         │ Phase 2: Fetch historical data       
+         ▼                                      
+┌─────────────────┐     ┌──────────────────┐    
+│  Azure Blob     │◀────│ Azure Functions  │
+│  Storage        │     │ (Monthly Update) │
+│  (Public Read)  │     └──────────────────┘
+└─────────────────┘     
 ```
 
-### Architecture Changes (June 7, 2025)
-- **✅ ELIMINATED**: Azure Redis Cache (99% cost reduction)
-- **✅ ELIMINATED**: Azure Functions for computation (client-side instead)
-- **✅ SIMPLIFIED**: Direct browser-to-CoinGecko API calls for Phase 1
-- **✅ OPTIMIZED**: Azure Blob Storage with public read access
-- **✅ MINIMIZED**: Single monthly Azure Function for data updates only
+### Current Implementation (Phase 1)
+- **Frontend**: Angular 17+ SPA with direct CoinGecko API calls
+- **Backend**: Local development only (not deployed)
+- **Infrastructure**: Azure Static Web App + Blob Storage (ready for Phase 2)
+- **Cost**: $0/month operational
 
-### Technology Stack Details
+### Technology Stack
+- **Frontend**: Angular 17+, TypeScript, Angular Material, RxJS
+- **API**: Direct CoinGecko free tier integration
+- **Hosting**: Azure Static Web App (free tier)
+- **Testing**: Jest with 70%+ coverage
+- **CI/CD**: GitHub Actions
 
-#### Frontend (Angular SPA)
-- **Angular 17+** with standalone components
-- **TypeScript 5.0+** with strict mode
-- **RxJS** for reactive programming
-- **Angular Material** for UI components
-- **Chart.js** with ng2-charts wrapper
-- **Tailwind CSS** for utility styling
+## CoinGecko API Integration
 
-#### Backend (Serverless)
-- **Azure Functions v4** with Node.js 18+
-- **TypeScript** for type safety
-- **Express.js** compatibility layer
-- **Joi** for request validation
-- **Axios** for HTTP requests
-- **Node-cache** for in-memory caching
+### Base URLs
+- **CoinGecko API**: `https://api.coingecko.com/api/v3`
+- **Rate Limits**: 50 calls/minute (free tier)
+- **Authentication**: None required
 
-#### Infrastructure
-- **Terraform** for IaC
-- **GitHub Actions** for CI/CD
-- **Azure Key Vault** for secrets
-- **Application Insights** for monitoring
+### Client-Side Endpoints
 
-## API Specification
-
-### Base URL Structure
+#### Market Data
+**GET** `/coins/markets`
 ```
-Production: https://api.cryptoportfolio.azure.com
-Development: https://api-dev.cryptoportfolio.azure.com
+Query Parameters:
+- vs_currency: usd
+- order: market_cap_desc
+- per_page: 1-250 (adjustable for exclusions)
+- page: 1
+- sparkline: false
+
+Response: Array of coin objects with price, market_cap, etc.
 ```
 
-### Authentication
-No authentication required (anonymous usage)
+#### Price Data
+**GET** `/simple/price`
+```
+Query Parameters:
+- ids: comma-separated coin IDs
+- vs_currencies: usd
 
-### Rate Limiting
-- 100 requests per minute per IP
-- 429 status code when exceeded
-- X-RateLimit headers included
-
-### Common Headers
-```http
-Content-Type: application/json
-X-API-Version: 1.0
-X-Request-ID: <uuid>
+Response: Object with coin prices
 ```
 
-## API Endpoints
+#### Search
+**GET** `/search`
+```
+Query Parameters:
+- query: search term
+
+Response: Search results with coins, exchanges, etc.
+```
+
+## Local Development API (Backend)
+
+> **Note**: These endpoints exist for local development only and are NOT deployed to production.
+
+### Base URL
+```
+Local Development: http://localhost:3001/api/v1
+```
+
+### Health Check
+**GET** `/health`
+```json
+Response:
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "timestamp": "2025-06-08T10:00:00Z"
+}
+```
 
 ### Market Data Endpoints
 
-#### GET /api/v1/market/top-coins
-Retrieve top cryptocurrencies by market cap.
+#### Get Top Coins
+**GET** `/market/top-coins`
+```
+Query Parameters:
+- limit (optional): Number of coins (default: 15, max: 50)
+- exclude (optional): Comma-separated symbols to exclude
 
-**Query Parameters:**
-- `limit` (optional): Number of coins (default: 15, max: 100)
-- `exclude` (optional): Comma-separated symbols to exclude
-
-**Response:**
-```json
+Response:
 {
   "data": [
     {
       "rank": 1,
-      "symbol": "BTC",
+      "symbol": "BTC", 
       "name": "Bitcoin",
       "price": 45000.00,
       "marketCap": 880000000000,
@@ -101,28 +118,23 @@ Retrieve top cryptocurrencies by market cap.
       "volume24h": 28000000000
     }
   ],
-  "timestamp": "2024-01-15T10:00:00Z",
+  "timestamp": "2025-06-08T10:00:00Z",
   "cached": true
 }
 ```
 
-#### GET /api/v1/market/prices
-Get current prices for specific coins.
+#### Get Coin Prices
+**GET** `/market/prices`
+```
+Query Parameters:
+- symbols (required): Comma-separated coin symbols
 
-**Query Parameters:**
-- `symbols` (required): Comma-separated coin symbols
-
-**Response:**
-```json
+Response:
 {
   "data": {
     "BTC": {
       "price": 45000.00,
-      "timestamp": "2024-01-15T10:00:00Z"
-    },
-    "ETH": {
-      "price": 2500.00,
-      "timestamp": "2024-01-15T10:00:00Z"
+      "timestamp": "2025-06-08T10:00:00Z"
     }
   }
 }
@@ -130,30 +142,26 @@ Get current prices for specific coins.
 
 ### Rebalancing Endpoints
 
-#### POST /api/v1/rebalance/calculate
-Calculate portfolio rebalancing recommendations.
-
-**Request Body:**
+#### Calculate Rebalancing
+**POST** `/rebalance/calculate`
 ```json
+Request Body:
 {
   "portfolio": {
     "holdings": [
       {"symbol": "BTC", "amount": 0.5},
       {"symbol": "ETH", "amount": 10}
     ],
-    "cashBalance": 5000
-  },
-  "excludedCoins": ["DOGE", "SHIB"],
-  "options": {
-    "topN": 15
+    "cashBalance": 5000,
+    "excludedCoins": ["DOGE", "SHIB"],
+    "maxCoins": 15
   }
 }
-```
 
-**Response:**
-```json
+Response:
 {
   "currentValue": 27500,
+  "totalValue": 32500,
   "targetAllocations": [
     {
       "symbol": "BTC",
@@ -164,7 +172,7 @@ Calculate portfolio rebalancing recommendations.
   ],
   "trades": [
     {
-      "symbol": "BTC",
+      "symbol": "BTC", 
       "action": "SELL",
       "amount": 0.0997,
       "usdValue": 4486.50
@@ -174,89 +182,25 @@ Calculate portfolio rebalancing recommendations.
     "totalBuys": 5000,
     "totalSells": 5000,
     "estimatedFees": 50
-  }
-}
-```
-
-### Backtesting Endpoints
-
-#### POST /api/v1/backtest/run
-Execute a portfolio backtest.
-
-**Request Body:**
-```json
-{
-  "portfolio": {
-    "holdings": [{"symbol": "BTC", "amount": 1}],
-    "cashBalance": 0
   },
-  "config": {
-    "startDate": "2022-01-01",
-    "endDate": "2023-12-31",
-    "rebalanceFrequency": "monthly",
-    "transactionFee": 0.5,
-    "slippage": 0.1,
-    "excludedCoins": []
+  "metadata": {
+    "timestamp": "2025-06-08T10:00:00Z",
+    "excludedCoins": ["DOGE", "SHIB"],
+    "maxCoins": 15
   }
 }
 ```
 
-**Response:**
-```json
-{
-  "summary": {
-    "initialValue": 47000,
-    "finalValue": 68500,
-    "totalReturn": 45.74,
-    "annualizedReturn": 20.87,
-    "sharpeRatio": 1.23,
-    "maxDrawdown": -22.5,
-    "totalFees": 1250
-  },
-  "timeSeries": [
-    {
-      "date": "2022-01-01",
-      "portfolioValue": 47000,
-      "hodlValue": 47000
-    }
-  ],
-  "rebalancingEvents": [
-    {
-      "date": "2022-02-01",
-      "trades": [...],
-      "fees": 125
-    }
-  ]
-}
+### Search Endpoints
+
+#### Search Coins
+**GET** `/coins/search`
 ```
+Query Parameters:
+- q (required): Search query
+- limit (optional): Results limit (default: 10)
 
-#### GET /api/v1/backtest/data-availability
-Check historical data availability for coins.
-
-**Response:**
-```json
-{
-  "coins": {
-    "BTC": {
-      "earliestDate": "2013-04-28",
-      "latestDate": "2024-01-15",
-      "dataQuality": "excellent"
-    }
-  }
-}
-```
-
-### Utility Endpoints
-
-#### GET /api/v1/coins/search
-Search for coins by name or symbol.
-
-**Query Parameters:**
-- `q` (required): Search query
-- `limit` (optional): Results limit (default: 10)
-
-**Response:**
-```json
+Response:
 {
   "results": [
     {
@@ -265,21 +209,6 @@ Search for coins by name or symbol.
       "logo": "https://..."
     }
   ]
-}
-```
-
-#### GET /api/v1/health
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "version": "1.0.0",
-  "dependencies": {
-    "coinGecko": "operational",
-    "redis": "operational"
-  }
 }
 ```
 
@@ -292,16 +221,16 @@ Health check endpoint.
     "code": "VALIDATION_ERROR",
     "message": "Invalid request parameters",
     "details": {
-      "field": "symbols",
+      "field": "symbols", 
       "issue": "Required parameter missing"
     }
   },
   "requestId": "550e8400-e29b-41d4-a716-446655440000",
-  "timestamp": "2024-01-15T10:00:00Z"
+  "timestamp": "2025-06-08T10:00:00Z"
 }
 ```
 
-### Error Codes
+### Common Error Codes
 - `VALIDATION_ERROR`: Invalid request parameters
 - `NOT_FOUND`: Resource not found
 - `RATE_LIMIT_EXCEEDED`: Too many requests
@@ -310,60 +239,52 @@ Health check endpoint.
 
 ## Caching Strategy
 
-### Cache Layers
-1. **Browser Cache**
-   - Static assets: 1 year
-   - API responses: Via Cache-Control headers
+### Client-Side Caching
+- **Market Data**: 5-minute cache in memory
+- **Static Assets**: Browser cache (1 year)
+- **API Responses**: Configurable TTL
 
-2. **Azure CDN**
-   - Static content edge caching
-   - Geographic distribution
+### Phase 2 Caching (Historical Data)
+- **Blob Storage**: Public CDN distribution
+- **File Format**: Single JSON per coin (7.2KB each)
+- **Update Frequency**: Monthly via Azure Function
 
-3. **Redis Cache**
-   - Market data: 5 minutes
-   - Backtest results: 1 hour
-   - API responses: Configurable TTL
+## Performance Targets
 
-### Cache Key Patterns
-```
-market:top-coins:15:exclude-DOGE,SHIB
-market:prices:BTC,ETH
-backtest:<hash-of-params>
-```
+### Current Performance (Phase 1)
+- **API Response Time**: < 3 seconds (with CoinGecko)
+- **Rebalancing Calculation**: < 1 second (client-side)
+- **Page Load**: < 3 seconds
+- **Chart Rendering**: < 500ms
+
+### Phase 2 Targets
+- **Backtesting**: 300-700ms (5-year analysis)
+- **Data Fetch**: 100-200ms (parallel downloads)
+- **Historical Data**: Sub-second loading
 
 ## Security Considerations
 
 ### API Security
-- HTTPS only
-- CORS configuration for frontend domain
-- Request validation and sanitization
-- Rate limiting per IP
-- API versioning for backward compatibility
-
-### Secret Management
-- API keys in Azure Key Vault
-- Environment variables for configuration
-- No sensitive data in code or logs
+- **HTTPS Only**: All API communications encrypted
+- **CORS**: Configured for frontend domain only
+- **Rate Limiting**: Respect CoinGecko limits
+- **No Secrets**: Free tier APIs, no authentication
 
 ### Data Privacy
-- No user data collection
-- No cookies or tracking
-- Portfolio data only in URL parameters
-- No server-side storage of user data
+- **No User Data**: Anonymous usage only
+- **No Cookies**: Stateless application
+- **URL Params Only**: Portfolio data in shareable links
+- **No Server Storage**: Client-side state management
 
-## Performance Targets
+## Development vs Production
 
-### API Response Times
-- Market data endpoints: < 200ms (cached)
-- Rebalancing calculation: < 500ms
-- Backtest execution: < 30s for 2-year period
+### Development Environment
+- **Backend**: Express server at localhost:3001
+- **Frontend**: Angular dev server at localhost:4200
+- **API**: Local backend with CoinGecko integration
 
-### Frontend Performance
-- Initial page load: < 2s
-- Time to interactive: < 3s
-- Lighthouse score: > 90
-
-### Scalability
-- Auto-scaling Azure Functions
-- Redis cluster for high availability
-- CDN for global distribution
+### Production Environment  
+- **Backend**: None (client-side only)
+- **Frontend**: Azure Static Web App
+- **API**: Direct CoinGecko from browser
+- **Cost**: $0/month operational

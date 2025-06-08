@@ -137,6 +137,7 @@ backend/src/
 ### Azure Infrastructure
 - **Terraform**: `infrastructure/environments/production-simple/`
 - **Main Config**: `infrastructure/environments/production-simple/main.tf`
+- **Deployment Guide**: `docs/DEPLOYMENT_INFRASTRUCTURE.md`
 
 ### CI/CD
 - **GitHub Actions**: `.github/workflows/ci.yml`
@@ -145,6 +146,29 @@ backend/src/
 ### Development Scripts
 - **Start Development**: `./start-dev.sh`
 - **Run All Tests**: `./test-all.sh`
+
+## 📚 Documentation Structure
+
+### AI-Optimized Context (Current)
+- **Project State**: `AI_CONTEXT/CURRENT_STATE.md`
+- **Code Patterns**: `AI_CONTEXT/CODE_PATTERNS.md`
+- **Constraints**: `AI_CONTEXT/CONSTRAINTS.md`
+- **File Map**: `AI_CONTEXT/FILE_MAP.md` (this file)
+- **Task Templates**: `AI_TASKS.md`
+- **AI Instructions**: `CLAUDE.md`
+
+### Human-Focused Documentation
+- **User Guide**: `README.md`
+- **Developer Setup**: `CONTRIBUTING.md`
+- **API Reference**: `docs/TECHNICAL_ARCHITECTURE.md`
+- **Deployment**: `docs/DEPLOYMENT_INFRASTRUCTURE.md`
+- **Testing Guide**: `docs/TESTING_GUIDE.md`
+- **Phase 2 Specs**: `docs/PHASE2_BACKTESTING.md`
+
+### Archived Documentation
+- **Historical Reference**: `.archive/` (outdated files)
+- **Previous Developer Guide**: `.archive/DEVELOPER_GUIDE.md`
+- **Deployment Session Notes**: `.archive/DEPLOYMENT_SESSION_SUMMARY.md`
 
 ## 🔍 Debug & Monitoring
 
