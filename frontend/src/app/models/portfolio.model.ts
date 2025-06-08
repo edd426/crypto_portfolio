@@ -4,8 +4,8 @@ export interface Coin {
   name: string;
   price: number;
   marketCap: number;
-  change24h: number;
-  volume24h: number;
+  change24h?: number;
+  volume24h?: number;
 }
 
 export interface Holding {
@@ -26,6 +26,42 @@ export interface Portfolio {
   lastUpdated?: Date;
 }
 
+export interface Trade {
+  symbol: string;
+  action: 'BUY' | 'SELL';
+  amount: number;
+  value: number;
+  usdValue: number; // Alias for value for backward compatibility
+  price: number;
+}
+
+export interface Allocation {
+  symbol: string;
+  percentage: number;
+  targetPercentage: number; // Alias for backward compatibility
+  price: number;
+  targetValue: number;
+  targetAmount: number;
+}
+
+export interface RebalanceResult {
+  targetAllocations: Allocation[];
+  trades: Trade[];
+  totalValue: number;
+  currentValue: number; // Alias for totalValue for backward compatibility
+  summary: {
+    totalBuys: number;
+    totalSells: number;
+    estimatedFees: number;
+  };
+  metadata: {
+    timestamp: string;
+    topN: number;
+    excludedCoins: string[];
+  };
+}
+
+// Legacy interface for backward compatibility
 export interface TradeRecommendation {
   symbol: string;
   action: 'BUY' | 'SELL';
@@ -33,22 +69,6 @@ export interface TradeRecommendation {
   usdValue: number;
   currentHolding: number;
   targetHolding: number;
-}
-
-export interface RebalanceResult {
-  currentValue: number;
-  targetAllocations: Array<{
-    symbol: string;
-    targetPercentage: number;
-    targetValue: number;
-    targetAmount: number;
-  }>;
-  trades: TradeRecommendation[];
-  summary: {
-    totalBuys: number;
-    totalSells: number;
-    estimatedFees: number;
-  };
 }
 
 export interface PortfolioMetrics {
