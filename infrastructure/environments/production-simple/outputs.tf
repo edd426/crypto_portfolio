@@ -24,3 +24,18 @@ output "application_insights_connection_string" {
   value       = azurerm_application_insights.main.connection_string
   sensitive   = true
 }
+
+output "storage_account_name" {
+  description = "Name of the storage account for historical data"
+  value       = azurerm_storage_account.historical_data.name
+}
+
+output "storage_account_url" {
+  description = "URL of the storage account blob endpoint"
+  value       = azurerm_storage_account.historical_data.primary_blob_endpoint
+}
+
+output "historical_data_container_url" {
+  description = "URL of the historical data container"
+  value       = "${azurerm_storage_account.historical_data.primary_blob_endpoint}${azurerm_storage_container.crypto_data.name}"
+}

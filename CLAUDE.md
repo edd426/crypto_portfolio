@@ -2,23 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Status: ✅ ARCHITECTURE OPTIMIZED - READY FOR IMPLEMENTATION
+## Project Status: ✅ CLIENT-SIDE ARCHITECTURE DEPLOYED - PHASE 1 COMPLETE
 
-**Last Updated**: June 7, 2025  
-**Current Phase**: Architecture finalized, ready for optimized deployment  
-**Status**: Production-ready application with finalized client-side architecture
+**Last Updated**: June 8, 2025  
+**Current Phase**: Phase 1 complete, Phase 2 backtesting ready for implementation  
+**Status**: Production client-side architecture deployed and functional
 
-## 🔄 **HANDOFF STATUS: READY FOR NEXT DEVELOPER**
+## 🔄 **HANDOFF STATUS: PHASE 1 DEPLOYED - READY FOR PHASE 2**
 
-### **Architecture Session Complete (June 7, 2025)**
-- ✅ **Architecture decisions finalized**: Client-side approach with 99% cost reduction
-- ✅ **Documentation updated**: All technical docs reflect optimized architecture  
-- ✅ **Implementation roadmap**: Clear step-by-step deployment plan provided
-- ✅ **Cost optimization**: $50-100/month → $0.01/month achieved
+### **Client-Side Implementation Complete (June 8, 2025)**
+- ✅ **Client-side architecture deployed**: Direct CoinGecko API integration functional
+- ✅ **Azure infrastructure updated**: Blob Storage added for Phase 2 historical data
+- ✅ **Production deployment**: Live at https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
+- ✅ **Cost optimization achieved**: $0/month operational cost (99%+ reduction)
 
-### 🎯 What Works Now
+### 🎯 What Works Now (Client-Side Architecture)
 - ✅ **Portfolio Entry**: Users can input crypto holdings and cash balance with manual text exclusion
-- ✅ **Rebalancing Calculation**: Real-time market cap-based rebalancing with CoinGecko API
+- ✅ **Client-Side Rebalancing**: Real-time market cap-based calculation with direct CoinGecko API calls
 - ✅ **Interactive Charts**: Proportional bar charts showing current vs target portfolio composition
 - ✅ **Smart Exclusion System**: Visual feedback showing effective vs ineffective coin exclusions
 - ✅ **Configurable Portfolio Size**: User-defined max coins (1-50) with exclusions counting against limit
@@ -26,53 +26,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Trade Recommendations**: Buy/sell recommendations with USD values
 - ✅ **URL Persistence**: Portfolio data saved in clean URL parameters (no timestamps)
 - ✅ **Responsive UI**: Angular Material design with proper form validation
-- ✅ **Robust Error Handling**: Rate limiting awareness and user-friendly API error messages
-- ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage + rate limiting tests
+- ✅ **Client-Side Caching**: 5-minute cache for CoinGecko API efficiency
+- ✅ **Zero Backend Dependencies**: No server-side code required for Phase 1
+- ✅ **Testing Framework**: Complete Jest testing suite with 70% coverage
 - ✅ **CI/CD Pipeline**: GitHub Actions with automated testing and linting
 - ✅ **Debug System**: Configurable verbosity levels for troubleshooting
-- ✅ **Azure Infrastructure**: Static Web App deployed with monitoring and cost controls
+- ✅ **Azure Infrastructure**: Static Web App + Blob Storage deployed
 
 ### 🚀 How to Start Development
 ```bash
-# Quick start (recommended)
-./start-dev.sh
-
-# Manual start
-cd backend && npm start    # Backend: http://localhost:3001
+# Frontend only (client-side architecture)
 cd frontend && npm start   # Frontend: http://localhost:4200
+
+# Optional: Backend for local testing/development
+cd backend && npm start    # Backend: http://localhost:3001 (not required for production)
+
+# Legacy quick start (includes unused backend)
+./start-dev.sh
 ```
 
 ## ☁️ Azure Infrastructure Status
 
-### ✅ Successfully Deployed (December 6, 2024)
+### ✅ Successfully Deployed (Updated June 8, 2025)
 - **Static Web App**: `stapp-cryptoportfolio-prod-9rc2a6`
-- **Live URL**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net
+- **Live URL (Production)**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net
+- **Live URL (Preview)**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
+- **Storage Account**: `stcrypto9rc2a6` with public blob container `historical-data`
 - **Resource Group**: `rg-cryptoportfolio-prod-9rc2a6`
 - **Application Insights**: Monitoring enabled
 - **Budget Alerts**: $25/month with email notifications to eddelord@gmail.com
-- **Monthly Cost**: ~$0-5 (FREE tier infrastructure)
+- **Monthly Cost**: ~$0-1 (FREE tier + minimal blob storage)
 
-### ⚠️ Known Limitations
-- **Azure Functions**: Blocked by quota limitations (Dynamic VMs: 0 quota)
-- **Backend**: Not deployed to Azure due to quota restrictions
+### ✅ Architecture Achievements
+- **Client-Side Implementation**: Direct CoinGecko API calls from browser
+- **99% Cost Reduction**: $0/month operational cost achieved
+- **Zero Backend Dependencies**: No Azure Functions required for Phase 1
+- **Phase 2 Ready**: Blob Storage configured for historical backtesting data
 
 ### 🛠️ Infrastructure Details
 - **Location**: West US 2
 - **Terraform**: Infrastructure as Code in `/infrastructure/environments/production-simple/`
 - **Resource Providers**: All registered and functional
 - **Monitoring**: Application Insights + budget controls active
+- **CORS**: Configured for direct browser access to blob storage
 
 ## Project Overview
 
 A web-based cryptocurrency portfolio analyzer that helps users rebalance their holdings according to market capitalization of the top 15 cryptocurrencies, with advanced backtesting capabilities.
 
-## Architecture (Current Implementation)
+## Architecture (Client-Side Implementation - June 8, 2025)
 
 - **Frontend**: Angular 17+ SPA with TypeScript, Angular Material, standalone components
-- **Backend**: Express.js Node.js server (NOT Azure Functions - this was changed during implementation)
-- **Data Source**: CoinGecko API for real-time market data
-- **Testing**: Jest + Supertest + Nock for comprehensive testing
+- **API Integration**: Direct CoinGecko API calls from browser with client-side caching
+- **Data Storage**: Azure Blob Storage for Phase 2 historical data
+- **Backend**: Express.js Node.js server (for local development only, not deployed)
+- **Testing**: Jest + Angular Testing Library for comprehensive testing
 - **CI/CD**: GitHub Actions pipeline with matrix testing
+- **Cost**: $0/month operational cost (99%+ reduction achieved)
 
 ## Key Commands
 
@@ -116,7 +126,7 @@ cd backend && npm run build
 
 ```
 crypto_portfolio/
-├── backend/                 # Express.js API server
+├── backend/                 # Express.js API server (development only, not deployed)
 │   ├── src/
 │   │   ├── controllers/     # API route handlers
 │   │   ├── services/        # Business logic (MarketDataService, RebalancingService)
@@ -128,15 +138,16 @@ crypto_portfolio/
 │   ├── jest.config.js       # Jest testing configuration
 │   └── package.json         # Dependencies and scripts
 │
-├── frontend/                # Angular 17+ SPA
+├── frontend/                # Angular 17+ SPA (client-side architecture)
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── components/  # Portfolio entry, results display
-│   │   │   ├── services/    # API service, URL persistence
+│   │   │   ├── services/    # API service (direct CoinGecko calls), URL persistence
 │   │   │   ├── models/      # TypeScript interfaces
 │   │   │   └── __tests__/   # Component and service tests
 │   │   ├── assets/          # Static assets
 │   │   └── styles.scss      # Global styles
+│   ├── dist/                # Production build output
 │   ├── .eslintrc.json       # ESLint configuration
 │   ├── jest.config.js       # Jest + Angular testing
 │   └── angular.json         # Angular project configuration
@@ -145,6 +156,14 @@ crypto_portfolio/
 │   ├── TESTING_GUIDE.md     # Comprehensive testing guide
 │   ├── PROJECT_OVERVIEW.md  # High-level project documentation
 │   └── *.md                 # Other planning documents
+│
+├── infrastructure/          # Terraform Infrastructure as Code
+│   ├── environments/
+│   │   └── production-simple/ # Active production environment
+│   │       ├── main.tf      # Static Web App + Blob Storage
+│   │       ├── outputs.tf   # Infrastructure outputs
+│   │       └── variables.tf # Configuration variables
+│   └── modules/            # Reusable Terraform modules
 │
 ├── .github/workflows/       # CI/CD pipeline
 │   └── ci.yml              # GitHub Actions workflow
@@ -157,47 +176,41 @@ crypto_portfolio/
 
 ## Key Features
 
-### Phase 1 (MVP) ✅ COMPLETE
+### Phase 1 (MVP) ✅ COMPLETE - CLIENT-SIDE ARCHITECTURE
 - Manual portfolio entry with text-based coin exclusion
-- Market cap-based rebalancing for configurable portfolio size (1-50 coins)
+- Client-side market cap-based rebalancing for configurable portfolio size (1-50 coins)
+- Direct CoinGecko API integration with 5-minute caching
 - URL-based portfolio persistence (clean URLs without timestamps)
 - Trade recommendations with USD values
 - Enhanced allocations view with current vs target comparison
-- Robust error handling including rate limiting
+- Zero backend dependencies and $0/month operational cost
 
-### Phase 2
-- Historical backtesting
-- Multiple rebalancing frequencies
+### Phase 2 (Ready for Implementation)
+- Historical backtesting with Azure Blob Storage data
+- Multiple rebalancing frequencies (monthly/quarterly/yearly)
 - Performance metrics (Sharpe ratio, max drawdown)
 - Transaction cost modeling
+- Monthly Azure Function for data updates (~$0.01/month)
 
-## API Endpoints (✅ Implemented & Working)
+## API Integration (Client-Side Implementation)
 
-- `GET /api/v1/health` - Health check endpoint
-- `GET /api/v1/market/top-coins?limit=15&exclude=USDT` - Top coins by market cap
-- `GET /api/v1/market/prices?symbols=BTC,ETH` - Current prices for symbols
-- `GET /api/v1/market/search?q=bitcoin&limit=10` - Search coins
-- `POST /api/v1/rebalance/calculate` - Calculate rebalancing (✅ WORKING)
+### CoinGecko API (Direct Browser Calls)
+- **Market Data**: `https://api.coingecko.com/api/v3/coins/markets` - Top coins by market cap
+- **Price Data**: `https://api.coingecko.com/api/v3/simple/price` - Current prices for symbols
+- **Search**: `https://api.coingecko.com/api/v3/search` - Search coins by name/symbol
+- **Rebalancing**: Client-side calculation using fetched market data
 
-### API Testing Examples
+### Client-Side Features
+- **5-minute caching**: Reduces API calls and improves performance
+- **Error handling**: Graceful fallbacks for rate limiting and API failures
+- **CORS support**: Direct browser access to CoinGecko API
+- **No authentication**: Uses free tier of CoinGecko API
+
+### Legacy Backend (Development Only)
 ```bash
-# Test backend health
+# Local testing endpoints (not deployed)
 curl http://localhost:3001/api/v1/health
-
-# Get top 5 coins
 curl "http://localhost:3001/api/v1/market/top-coins?limit=5"
-
-# Test rebalancing (the main feature)
-curl -X POST http://localhost:3001/api/v1/rebalance/calculate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "portfolio": {
-      "holdings": [{"symbol": "BTC", "amount": 0.5}, {"symbol": "ETH", "amount": 7}],
-      "cashBalance": 800,
-      "excludedCoins": []
-    },
-    "excludedCoins": []
-  }'
 ```
 
 ## Debug System
@@ -355,26 +368,27 @@ npm run test:coverage       # With coverage reports
 
 ## 🚀 **IMMEDIATE NEXT STEPS FOR NEW DEVELOPER**
 
-### ✅ **ARCHITECTURE DECISIONS FINALIZED (June 7, 2025)**
+### ✅ **PHASE 1 CLIENT-SIDE ARCHITECTURE COMPLETE (June 8, 2025)**
 
-**All major architectural decisions have been finalized. The next developer should immediately begin implementation of the optimized client-side architecture.**
+**Phase 1 client-side architecture has been successfully implemented and deployed. The next developer should focus on Phase 2 backtesting implementation.**
 
-### 📋 **DEVELOPER HANDOFF CHECKLIST**
+### 📋 **PHASE 1 COMPLETION CHECKLIST**
 
-- [ ] **TASK 1**: Configure Azure Blob Storage with public read access and CORS
-- [ ] **TASK 2**: Modify Angular frontend to call CoinGecko API directly from browser  
-- [ ] **TASK 3**: Remove all backend dependencies from frontend code
-- [ ] **TASK 4**: Deploy client-side frontend to existing Azure Static Web App
-- [ ] **TASK 5**: Test portfolio analysis functionality with direct API calls
-- **Expected Result**: $0/month cost, immediate deployment, fully functional Phase 1
+- [x] **TASK 1**: Configure Azure Blob Storage with public read access and CORS
+- [x] **TASK 2**: Modify Angular frontend to call CoinGecko API directly from browser  
+- [x] **TASK 3**: Remove all backend dependencies from frontend code
+- [x] **TASK 4**: Deploy client-side frontend to existing Azure Static Web App
+- [x] **TASK 5**: Test portfolio analysis functionality with direct API calls
+- **✅ Result Achieved**: $0/month cost, deployed and functional Phase 1
 
-#### **Phase 2: Backtesting Implementation (Week 2-3)**
-- [ ] **TASK 6**: Create monthly Azure Function for data fetching (1st of month)
-- [ ] **TASK 7**: Populate Azure Blob Storage with historical crypto data  
+### 📋 **PHASE 2: BACKTESTING IMPLEMENTATION (NEXT PRIORITIES)**
+- [ ] **TASK 6**: Create monthly Azure Function for historical data fetching (1st of month)
+- [ ] **TASK 7**: Populate Azure Blob Storage with historical crypto data (5 years)  
 - [ ] **TASK 8**: Implement client-side backtesting calculations in Angular
 - [ ] **TASK 9**: Add monthly/quarterly/yearly rebalancing frequency options
-- [ ] **TASK 10**: Test complete backtesting workflow end-to-end
-- **Expected Result**: ~$0.01/month cost, 300-700ms backtesting performance
+- [ ] **TASK 10**: Create backtesting UI components and charts
+- [ ] **TASK 11**: Test complete backtesting workflow end-to-end
+- **Expected Result**: ~$0.01/month cost, sub-second backtesting performance
 
 ### 📋 **KEY IMPLEMENTATION DETAILS**
 
@@ -398,33 +412,47 @@ npm run test:coverage       # With coverage reports
 
 ### 📝 **HANDOFF NOTES**
 
-#### **Repository Status**
+#### **Phase 1 Status: ✅ COMPLETE**
 - **Clean codebase**: All tests passing (70%+ coverage)
-- **Documentation updated**: All architectural decisions recorded
-- **Infrastructure ready**: Azure Static Web App deployed and functional
-- **Pending changes**: Documentation updates need to be committed
+- **Client-side architecture**: Successfully deployed and functional
+- **Live application**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
+- **Cost optimization**: 99%+ reduction achieved ($0/month operational cost)
 
-#### **What's Been Optimized**
-- **Architecture**: Complex server infrastructure → Simple client-side approach
-- **Costs**: $50-100/month → $0.01/month (99%+ reduction)
-- **Performance**: Eliminated cold starts, sub-second backtesting
-- **Complexity**: Removed Redis, API Management, complex Functions
+#### **What's Been Implemented (June 8, 2025)**
+- **Frontend**: Rewritten to call CoinGecko API directly from browser
+- **Caching**: 5-minute client-side cache for API efficiency
+- **Infrastructure**: Azure Blob Storage added for Phase 2 data
+- **Deployment**: Production-ready Static Web App deployment
+- **Backend Dependencies**: Completely eliminated for Phase 1
 
-#### **Ready for Implementation**
-The next developer has everything needed to implement the optimized architecture:
-- Detailed step-by-step tasks in this document
-- Complete technical specifications in `/docs/` folder
-- Working codebase with comprehensive test suite
-- Pre-deployed Azure infrastructure ready for use
+#### **Ready for Phase 2**
+The next developer has everything needed for backtesting implementation:
+- **Infrastructure**: Blob Storage configured and ready
+- **Architecture**: Client-side foundation complete
+- **Documentation**: Complete technical specifications in `/docs/` folder
+- **Codebase**: Clean, tested, and production-deployed
 
-**Estimated implementation time**: 1-2 weeks for complete deployment
+**Estimated Phase 2 implementation time**: 1-2 weeks for historical backtesting
 
 ## Development Guidelines
 
+### Client-Side Architecture (Current)
 - Use TypeScript strict mode
-- Follow Angular style guide  
-- Implement comprehensive error handling
-- Cache API responses to minimize costs
+- Follow Angular style guide for standalone components
+- Implement comprehensive error handling for direct API calls
+- Use client-side caching (5-minute window) to minimize API usage
 - Write tests for all new features (Jest setup already complete)
-- Run `./test-all.sh` before committing changes
-- Use `./start-dev.sh` for development workflow
+- Test locally with `cd frontend && npm start` (backend optional)
+- Deploy using Azure Static Web Apps CLI
+
+### Phase 2 Development
+- Implement historical data fetching with Azure Functions
+- Store data in Azure Blob Storage (JSON format)
+- Maintain client-side calculations for performance
+- Test backtesting performance (target: sub-second execution)
+
+### Commands
+- `cd frontend && npm start` - Start development (client-side only)
+- `npm test` - Run all tests
+- `./test-all.sh` - Comprehensive test suite
+- `terraform apply` - Deploy infrastructure changes

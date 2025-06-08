@@ -69,6 +69,40 @@ resource "azurerm_static_web_app" "main" {
   tags = local.common_tags
 }
 
+# Storage Account for historical data (client-side architecture)
+resource "azurerm_storage_account" "historical_data" {
+  name                     = "stcrypto${random_string.suffix.result}"
+  resource_group_name      = azurerm_resource_group.main.name
+  location                = azurerm_resource_group.main.location
+  account_tier            = "Standard"
+  account_replication_type = "LRS"  # Cheapest option
+  
+  # Security settings
+  min_tls_version                 = "TLS1_2"
+  enable_https_traffic_only       = true
+  allow_nested_items_to_be_public = true
+  
+  # CORS settings for browser access
+  blob_properties {
+    cors_rule {
+      allowed_headers    = ["*"]
+      allowed_methods    = ["GET", "HEAD", "OPTIONS"]
+      allowed_origins    = ["*"]  # Will be restricted to your domain in production
+      exposed_headers    = ["*"]
+      max_age_in_seconds = 3600
+    }
+  }
+  
+  tags = local.common_tags
+}
+
+# Container for historical crypto data
+resource "azurerm_storage_container" "crypto_data" {
+  name                  = "historical-data"
+  storage_account_name  = azurerm_storage_account.historical_data.name
+  container_access_type = "blob"  # Public read access for individual blobs
+}
+
 # Application Insights (FREE tier)
 resource "azurerm_application_insights" "main" {
   name                = "appi-${local.resource_prefix}"
