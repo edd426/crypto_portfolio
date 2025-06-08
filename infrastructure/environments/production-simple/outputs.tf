@@ -39,3 +39,9 @@ output "historical_data_container_url" {
   description = "URL of the historical data container"
   value       = "${azurerm_storage_account.historical_data.primary_blob_endpoint}${azurerm_storage_container.crypto_data.name}"
 }
+
+output "storage_connection_string" {
+  description = "Connection string for storage account"
+  value       = azurerm_storage_account.historical_data.primary_connection_string
+  sensitive   = true
+}
