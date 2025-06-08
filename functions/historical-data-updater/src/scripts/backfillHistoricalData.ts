@@ -223,7 +223,7 @@ async function fetchCompleteHistoricalData(coinId: string): Promise<HistoricalDa
       {
         params: {
           vs_currency: 'usd',
-          days: 'max', // Get maximum available history
+          days: 365, // 1 year (confirmed working with free API)
           interval: 'daily' // Daily intervals for historical data
         },
         timeout: 60000 // Longer timeout for large datasets

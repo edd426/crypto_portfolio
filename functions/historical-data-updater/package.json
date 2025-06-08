@@ -7,7 +7,10 @@
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
-    "test": "jest"
+    "test": "jest",
+    "download-history": "npm run build && node download-history.js",
+    "download-history:dev": "npm run build && node download-history.js",
+    "test-download": "npm run build && node test-download.js"
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",

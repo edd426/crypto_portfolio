@@ -132,9 +132,9 @@ export class BacktestingService {
     coinData: { [symbol: string]: CoinHistoricalData };
     rebalanceDates: string[];
   }> {
-    // Get all available coins for the period
-    const allSymbols = ['BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'SOL', 'DOGE', 'DOT', 'MATIC', 'LTC', 
-                       'AVAX', 'SHIB', 'TRX', 'ATOM', 'LINK', 'UNI', 'XMR', 'ETC', 'BCH', 'NEAR'];
+    // Use all available coins from historical data (97 top cryptocurrencies)
+    // TODO: Could be optimized to only fetch coins needed for the portfolio
+    const allSymbols = this.historicalDataService.getAvailableCoins();
 
     return this.historicalDataService.getMultipleCoinData(allSymbols).pipe(
       map(coinData => {

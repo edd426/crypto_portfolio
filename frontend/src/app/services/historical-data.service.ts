@@ -102,6 +102,27 @@ export class HistoricalDataService {
   }
 
   /**
+   * Get list of all available coins from blob storage
+   * Returns the 97 cryptocurrencies that have historical data
+   */
+  getAvailableCoins(): string[] {
+    // All 97 unique cryptocurrencies available in our historical data storage
+    // Updated June 8, 2025 - covers 100% of top 100 unique symbols
+    return [
+      'AAVE', 'ADA', 'ALGO', 'APT', 'ARB', 'ATOM', 'AVAX', 'BCH', 'BGB', 'BNB',
+      'BNSOL', 'BONK', 'BSC-USD', 'BTC', 'BUIDL', 'CBBTC', 'CRO', 'DAI', 'DOGE', 'DOT',
+      'ENA', 'ETC', 'ETH', 'FARTCOIN', 'FDUSD', 'FET', 'FIL', 'FLR', 'FTN', 'GT',
+      'HBAR', 'HYPE', 'ICP', 'IMX', 'INJ', 'IP', 'JITOSOL', 'JLP', 'JUP', 'KAS',
+      'KCS', 'LBTC', 'LEO', 'LINK', 'LTC', 'MNT', 'NEAR', 'NEXO', 'OKB', 'ONDO',
+      'OP', 'PEPE', 'PI', 'POL', 'PYUSD', 'QNT', 'RENDER', 'RETH', 'RSETH', 'S',
+      'SEI', 'SHIB', 'SKY', 'SOL', 'SOLVBTC', 'SPX', 'STETH', 'STX', 'SUI', 'SUSDE',
+      'SUSDS', 'TAO', 'TIA', 'TKX', 'TON', 'TRUMP', 'TRX', 'UNI', 'USD1',
+      'USDC', 'USDE', 'USDS', 'USDT', 'USDT0', 'USDTB', 'VET', 'VIRTUAL', 'WBT', 'WBTC',
+      'WEETH', 'WETH', 'WLD', 'WSTETH', 'XDC', 'XLM', 'XMR', 'XRP'
+    ];
+  }
+
+  /**
    * Get data availability information for coins
    */
   getDataAvailability(symbols: string[]): Observable<{ [symbol: string]: { earliestDate: string; latestDate: string; dataPoints: number } }> {
@@ -177,7 +198,7 @@ export class HistoricalDataService {
    * Prefetch data for commonly used coins
    */
   prefetchCommonCoins(): void {
-    const commonCoins = ['BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'SOL', 'DOGE', 'DOT', 'MATIC', 'LTC'];
+    const commonCoins = ['BTC', 'ETH', 'USDT', 'XRP', 'SOL'];
     
     commonCoins.forEach(symbol => {
       this.getCoinHistoricalData(symbol).subscribe({
@@ -203,13 +224,21 @@ export class HistoricalDataService {
   }
 
   private validateAndTransform(data: any, symbol: string): CoinHistoricalData {
+    // Handle our blob storage format (priceHistory) and expected format (data)
+    const historyData = data.priceHistory || data.data;
+    
     // Basic validation
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      throw new Error(`Invalid data format for ${symbol}`);
+    if (!data || !historyData || !Array.isArray(historyData)) {
+      throw new Error(`Invalid data format for ${symbol}. Expected priceHistory or data array.`);
     }
 
-    // Ensure data is sorted by date
-    const sortedData = [...data.data].sort((a, b) => 
+    // Transform to expected format and ensure data is sorted by date
+    const sortedData = [...historyData].map(point => ({
+      date: point.date,
+      price: point.price,
+      marketCap: point.marketCap,
+      volume24h: point.volume || point.volume24h || 0
+    })).sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
