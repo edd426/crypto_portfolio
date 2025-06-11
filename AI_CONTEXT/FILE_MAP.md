@@ -154,12 +154,13 @@ backend/src/
 - **Code Patterns**: `AI_CONTEXT/CODE_PATTERNS.md`
 - **Constraints**: `AI_CONTEXT/CONSTRAINTS.md`
 - **File Map**: `AI_CONTEXT/FILE_MAP.md` (this file)
-- **Task Templates**: `AI_TASKS.md`
+- **Task Templates**: `AI_CONTEXT/AI_TASKS.md`
 - **AI Instructions**: `CLAUDE.md`
+- **Claude Commands**: `.claude/commands/onboard.md`, `.claude/commands/handoff.md`
 
 ### Human-Focused Documentation
 - **User Guide**: `README.md`
-- **Developer Setup**: `CONTRIBUTING.md`
+- **Developer Setup**: `README.md` (Development Guide section)
 - **API Reference**: `docs/TECHNICAL_ARCHITECTURE.md`
 - **Deployment**: `docs/DEPLOYMENT_INFRASTRUCTURE.md`
 - **Testing Guide**: `docs/TESTING_GUIDE.md`

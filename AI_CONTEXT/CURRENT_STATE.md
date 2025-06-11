@@ -9,32 +9,25 @@
 
 ## 🚀 IMMEDIATE NEXT PRIORITIES
 
-### 1. Phase 2 Backtesting Implementation
-- **Files**: `docs/PHASE2_BACKTESTING.md` for complete specifications
-- **Infrastructure**: Azure Blob Storage already configured and ready
-- **Cost Target**: $0.01/month (client-side calculations)
-
-### 2. UI/UX Enhancements
-- **Files**: `frontend/src/app/components/` for UI components
-- **Focus**: Mobile responsiveness, chart visualization improvements
-
-### 3. Performance Optimization
-- **Files**: `frontend/src/app/services/api.service.ts` for caching optimizations
-- **Focus**: Chart rendering performance in rebalancing-results component
+Phase 2 infrastructure is complete. Immediate opportunities:
+1. **Update frontend** to use all 97 coins (currently limited to 5)
+2. **Enhanced UI** for coin selection in backtesting
+3. **Performance optimization** for large portfolios
+4. **Advanced metrics** (rolling Sharpe, correlation analysis)
+5. **Export functionality** (CSV, PDF reports)
 
 ## 📝 RECENT SESSION NOTES
-- **What was completed**: Complete documentation reorganization with AI-optimized structure
-- **Known issues**: None identified - all tests passing, application fully functional
-- **Next logical features**: Phase 2 backtesting is the primary roadmap item
-- **Testing notes**: Maintain 70%+ coverage, comprehensive test suite in place
+- **What was completed**: Documentation cleanup and organization (root directory streamlined)
+- **Known issues**: Tests need updating for client-side architecture (currently expect backend endpoints)
+- **Next logical features**: Test suite modernization, then Phase 2 backtesting enhancements  
+- **Testing notes**: Frontend linting passes, tests need architectural alignment
 
 ## 📁 FILES MODIFIED RECENTLY
-- `CLAUDE.md` - Streamlined AI agent instructions (458→80 lines)
-- `AI_CONTEXT/` - Created 4 specialized AI reference files
-- `AI_TASKS.md` - Added common task templates and session handoff protocol
-- `CONTRIBUTING.md` - Created comprehensive developer onboarding guide
-- `README.md` - Updated to concise, user-focused overview
-- `.archive/` - Moved outdated documentation files
+- `README.md` - Merged CONTRIBUTING.md content into comprehensive Development Guide section
+- `.archive/` - Moved 5 session-specific documentation files for cleaner root directory
+- `AI_CONTEXT/AI_TASKS.md` - Migrated from root to AI_CONTEXT directory for better organization
+- `.claude/commands/onboard.md` - Created quick onboarding command for new AI agents
+- Updated all file references throughout documentation to reflect new structure
 
 ## 🏗️ ARCHITECTURE
 - **Client-side only**: No backend deployment
@@ -82,3 +75,42 @@
 - **Next**: Historical backtesting implementation
 - **Timeline**: 1-2 weeks estimated
 - **Cost**: $0.01/month projected
+
+---
+
+## 🚀 HANDOFF NOTES (Updated: June 11, 2025)
+
+### **What Was Just Completed**
+- **Documentation cleanup**: Root directory streamlined from 9 to 2 .md files
+- **File organization**: CONTRIBUTING.md merged into README.md, AI_TASKS.md moved to AI_CONTEXT/
+- **Archive system**: 5 session-specific files moved to .archive/ for historical reference
+- **Claude commands**: Created onboard.md for quick AI agent project understanding
+
+### **Immediate Priorities for Next Developer**
+
+#### 1. **Test Suite Modernization** (Priority: HIGH)
+- **Issue**: Tests expect backend endpoints but app uses direct CoinGecko API
+- **Files**: `frontend/src/app/services/__tests__/api.service.spec.ts`
+- **Action**: Update test mocks to expect CoinGecko API calls instead of localhost backend
+- **Impact**: Restore 70%+ test coverage requirement
+
+#### 2. **Phase 2 Backtesting Enhancement** (Priority: MEDIUM)  
+- **Current**: Basic backtesting infrastructure ready with 97 cryptocurrencies
+- **Files**: `frontend/src/app/services/backtesting.service.ts`
+- **Action**: Expand beyond current 5-coin limitation to use all available historical data
+- **Impact**: Unlock full potential of existing data infrastructure
+
+#### 3. **Documentation Validation** (Priority: LOW)
+- **Action**: Verify all documentation links work after file reorganization
+- **Files**: All files with cross-references to moved documents
+- **Impact**: Ensure seamless developer onboarding experience
+
+### **Known Issues**
+- **Test Architecture Mismatch**: Tests need updating for client-side architecture
+- **Backend Linting**: 3 ESLint errors in backend (local dev only, not blocking)
+- **Live Application**: Fully functional at production URL
+
+### **Files to Focus On**
+- **Primary**: `frontend/src/app/services/__tests__/api.service.spec.ts` (test updates)
+- **Secondary**: `frontend/src/app/services/backtesting.service.ts` (feature expansion)
+- **Reference**: `AI_CONTEXT/CONSTRAINTS.md` (architectural guidelines)

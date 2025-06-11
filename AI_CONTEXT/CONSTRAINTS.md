@@ -3,17 +3,18 @@
 
 ## 🚨 CRITICAL CONSTRAINTS
 
-### 1. NO Backend Deployment
-- **NEVER deploy backend code** to Azure or any cloud service
-- Backend exists only for local development reference
-- All production functionality must be client-side
-- Direct browser-to-CoinGecko API calls only
+### 1. Limited Backend Infrastructure
+- **NO traditional backend services** - no APIs, databases, or real-time processing
+- **EXCEPTION**: Single Azure Function for monthly historical data updates (Phase 2)
+- All user-facing functionality must be client-side
+- Direct browser-to-CoinGecko API calls for real-time data
+- Backend code exists only for local development reference
 
-### 2. $0/Month Operational Cost
-- **MUST maintain zero monthly cost** for Phase 1
-- Only Azure Static Web App (free tier) allowed
-- No Azure Functions until Phase 2
+### 2. Minimal Operational Cost
+- **Phase 1**: $0/month operational cost (Static Web App only)
+- **Phase 2**: Maximum $0.01/month (includes 1 Azure Function for data updates)
 - No additional cloud services without approval
+- No premium tiers or paid features without approval
 
 ### 3. Client-Side Only Architecture  
 - All calculations must run in browser JavaScript
@@ -119,11 +120,11 @@
 ## 🚫 FORBIDDEN ACTIONS
 
 ### Never Do These:
-1. **Deploy backend** to any cloud service
-2. **Add monthly costs** without explicit approval  
+1. **Deploy traditional backend services** (APIs, databases, real-time processing)
+2. **Exceed $0.01/month** operational cost
 3. **Break test coverage** below 70%
 4. **Add user authentication** or login systems
-5. **Use databases** or persistent storage services
+5. **Use databases** or persistent storage services beyond Blob Storage
 6. **Create new Azure resources** without approval
 7. **Bypass rate limiting** or abuse APIs
 8. **Remove caching** mechanisms

@@ -1,4 +1,4 @@
-# AI_TASKS.md - Common Task Templates
+# AI_CONTEXT/AI_TASKS.md - Common Task Templates
 *Updated: June 8, 2025 - Added comprehensive session handoff protocol*
 
 ## 🔧 Adding a New Feature
@@ -193,7 +193,7 @@ grep -r "console.log" frontend/src/ --exclude-dir=node_modules
 - Modified testing requirements
 
 #### 8. Update Task Templates
-**Update `AI_TASKS.md`** if you:
+**Update `AI_CONTEXT/AI_TASKS.md`** if you:
 - Created new workflows
 - Found better approaches to existing tasks
 - Identified common issues and solutions
@@ -223,7 +223,7 @@ grep -r "console.log" frontend/src/ --exclude-dir=node_modules
 - [ ] Tech stack components
 - [ ] Setup instructions
 
-#### 11. Update CONTRIBUTING.md
+#### 11. Update README.md Development Guide
 **Update if you modified**:
 - [ ] Development workflow
 - [ ] New tools or dependencies
