@@ -21,13 +21,19 @@ describe('RebalancingResultsComponent - Charts', () => {
 
   const mockResult = {
     currentValue: 12000,
+    totalValue: 12000,
     targetAllocations: [
-      { symbol: 'BTC', targetPercentage: 60, targetValue: 7200, targetAmount: 0.144 },
-      { symbol: 'ETH', targetPercentage: 25, targetValue: 3000, targetAmount: 1.0 },
-      { symbol: 'XRP', targetPercentage: 15, targetValue: 1800, targetAmount: 3000 }
+      { symbol: 'BTC', targetPercentage: 60, percentage: 60, targetValue: 7200, targetAmount: 0.144, price: 50000 },
+      { symbol: 'ETH', targetPercentage: 25, percentage: 25, targetValue: 3000, targetAmount: 1.0, price: 3000 },
+      { symbol: 'XRP', targetPercentage: 15, percentage: 15, targetValue: 1800, targetAmount: 3000, price: 0.6 }
     ],
     trades: [],
-    summary: { totalBuys: 0, totalSells: 0, estimatedFees: 0 }
+    summary: { totalBuys: 0, totalSells: 0, estimatedFees: 0 },
+    metadata: {
+      timestamp: '2024-01-01T00:00:00Z',
+      topN: 15,
+      excludedCoins: []
+    }
   };
 
   beforeEach(async () => {
@@ -157,7 +163,7 @@ describe('RebalancingResultsComponent - Charts', () => {
   describe('Edge Cases', () => {
     it('should handle empty portfolio holdings', () => {
       component.portfolio = { holdings: [], cashBalance: 1000, excludedCoins: [] };
-      component.result = { ...mockResult, currentValue: 1000 };
+      component.result = { ...mockResult, currentValue: 1000, totalValue: 1000 };
       
       const chartData = component.getCurrentPortfolioChartData();
       
