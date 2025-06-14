@@ -21,6 +21,20 @@
 - **Service**: `frontend/src/app/services/portfolio-url.service.ts`
 - **Tests**: `frontend/src/app/services/__tests__/portfolio-url.service.spec.ts`
 
+### Historical Backtesting (Phase 2)
+- **Main Component**: `frontend/src/app/components/backtesting/backtesting.component.ts`
+- **Backtesting Service**: `frontend/src/app/services/backtesting.service.ts`
+- **Historical Data Service**: `frontend/src/app/services/historical-data.service.ts`
+- **Tests**: *Need to be created for full coverage*
+
+### Error Handling
+- **Error Handler Utility**: `frontend/src/app/utils/error-handler.util.ts`
+- **Tests**: `frontend/src/app/utils/__tests__/error-handler.util.spec.ts`
+
+### App Integration
+- **Root Component**: `frontend/src/app/app.component.ts`
+- **Tests**: `frontend/src/app/__tests__/app.component.spec.ts`
+
 ### Type Definitions
 - **Main Types**: `frontend/src/app/models/portfolio.model.ts`
 - **Backend Types**: `backend/src/models/types.ts` (local dev reference)
@@ -37,13 +51,21 @@ frontend/src/app/
 │   ├── rebalancing-results/       # Results display & charts
 │   │   ├── rebalancing-results.component.ts
 │   │   └── rebalancing-results.component.html
+│   ├── backtesting/               # Historical backtesting
+│   │   └── backtesting.component.ts
 │   └── __tests__/                 # Component tests
 ├── services/
 │   ├── api.service.ts             # CoinGecko API calls
 │   ├── portfolio-url.service.ts   # URL state management
+│   ├── backtesting.service.ts     # Backtesting logic
+│   ├── historical-data.service.ts # Historical data management
 │   └── __tests__/                 # Service tests
+├── utils/
+│   ├── error-handler.util.ts      # Error handling utilities
+│   └── __tests__/                 # Utility tests
 ├── models/
 │   └── portfolio.model.ts         # TypeScript interfaces
+├── __tests__/                     # App component tests
 └── app.component.ts               # Root component
 ```
 
@@ -58,7 +80,7 @@ backend/src/
 │   └── rebalancingService.ts      # Calculation engine
 ├── models/
 │   └── types.ts                   # Shared interfaces
-└── __tests__/                     # Backend tests
+└── __tests__/                     # [REMOVED] Backend tests deleted
 ```
 
 ## 🔧 Common Modification Scenarios
@@ -98,16 +120,17 @@ backend/src/
 ## 🧪 Test File Locations
 
 ### Frontend Tests
+- **App Component Tests**: `frontend/src/app/__tests__/app.component.spec.ts`
 - **Component Tests**: `frontend/src/app/components/__tests__/`
 - **Service Tests**: `frontend/src/app/services/__tests__/`
+- **Utility Tests**: `frontend/src/app/utils/__tests__/`
 - **Test Config**: `frontend/jest.config.js`
 - **Setup**: `frontend/src/setup-jest.ts`
 
-### Backend Tests (Local Dev)
-- **Unit Tests**: `backend/src/__tests__/unit/`
-- **Integration Tests**: `backend/src/__tests__/integration/`
-- **Test Config**: `backend/jest.config.js`
-- **Setup**: `backend/src/__tests__/setup.ts`
+### Backend Tests (REMOVED)
+- **Status**: All backend tests removed for client-side architecture
+- **Previous Location**: `backend/src/__tests__/` (9 test files deleted)
+- **Test Framework**: Jest (now frontend-only)
 
 ## 🎨 Styling & Assets
 

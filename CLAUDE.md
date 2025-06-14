@@ -16,6 +16,7 @@ npm run lint                   # Code quality check
 - **Rebalancing**: `frontend/src/app/components/rebalancing-results/`
 - **Portfolio Entry**: `frontend/src/app/components/portfolio-entry/`
 - **Types**: `frontend/src/app/models/portfolio.model.ts`
+- **Tests**: `frontend/src/app/__tests__/`, `frontend/src/app/*//__tests__/`
 
 ## 🔗 Detailed Context
 - `AI_CONTEXT/CURRENT_STATE.md` - Current deployment status & next priorities
@@ -30,5 +31,5 @@ npm run lint                   # Code quality check
 - **API**: Direct CoinGecko integration (free tier, rate limited)
 - **Hosting**: Azure Static Web App
 - **Data**: Azure Blob Storage (97 cryptocurrencies, 1 year historical data)
-- **Testing**: Jest + Angular Testing Library
+- **Testing**: Jest (105/105 tests passing, 57.3% coverage)
 

@@ -34,7 +34,7 @@ cd crypto_portfolio
 - **Frontend**: Angular 17+ with TypeScript, Material Design
 - **API**: Direct CoinGecko integration (no backend required)
 - **Hosting**: Azure Static Web App ($0/month operational cost)
-- **Testing**: Jest with 70%+ coverage
+- **Testing**: Jest with 105/105 tests passing (57.3% coverage)
 - **CI/CD**: GitHub Actions
 
 ## 📋 For Developers
