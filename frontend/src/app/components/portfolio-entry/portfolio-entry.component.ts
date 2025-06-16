@@ -348,7 +348,7 @@ export class PortfolioEntryComponent implements OnInit, OnChanges {
         this.availableCoinsForExclusion = response.data;
       },
       error: (error) => {
-        console.error('Error loading top coins for exclusion:', error);
+        // Error: Console error removed
         // Fallback with common coins
         this.availableCoinsForExclusion = [
           { rank: 1, symbol: 'BTC', name: 'Bitcoin', price: 0, marketCap: 0, change24h: 0, volume24h: 0 },

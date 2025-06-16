@@ -1,0 +1,372 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { of, throwError } from 'rxjs';
+
+import { BacktestingComponent } from '../backtesting.component';
+import { BacktestingService, BacktestConfig, BacktestResult } from '../../../services/backtesting.service';
+import { HistoricalDataService } from '../../../services/historical-data.service';
+
+describe('BacktestingComponent', () => {
+  let component: BacktestingComponent;
+  let fixture: ComponentFixture<BacktestingComponent>;
+  let backtestingService: any;
+  let historicalDataService: any;
+
+  const mockBacktestResult: BacktestResult = {
+    config: {
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2023-01-01'),
+      initialValue: 10000,
+      rebalanceFrequency: 'monthly',
+      transactionFeePercent: 0.5,
+      slippagePercent: 0.1,
+      maxCoins: 15,
+      excludedCoins: []
+    },
+    portfolioHistory: [
+      {
+        date: '2022-01-01',
+        totalValue: 10000,
+        holdings: {
+          'BTC': { amount: 0.5, value: 5000, percentage: 50 },
+          'ETH': { amount: 2, value: 5000, percentage: 50 }
+        },
+        cash: 0
+      },
+      {
+        date: '2023-01-01',
+        totalValue: 12000,
+        holdings: {
+          'BTC': { amount: 0.4, value: 6000, percentage: 50 },
+          'ETH': { amount: 1.8, value: 6000, percentage: 50 }
+        },
+        cash: 0
+      }
+    ],
+    rebalanceEvents: [
+      {
+        date: '2022-06-01',
+        beforeValue: 11000,
+        afterValue: 10950,
+        trades: [
+          {
+            symbol: 'BTC',
+            action: 'SELL',
+            amount: 0.1,
+            price: 30000,
+            value: 3000,
+            fee: 15
+          }
+        ],
+        fees: 50,
+        portfolioBefore: { 'BTC': 0.5, 'ETH': 2 },
+        portfolioAfter: { 'BTC': 0.4, 'ETH': 2.2 }
+      }
+    ],
+    metrics: {
+      totalReturn: 20,
+      annualizedReturn: 18.5,
+      volatility: 25,
+      sharpeRatio: 0.8,
+      maxDrawdown: -15,
+      winRate: 65,
+      totalFees: 150,
+      numberOfRebalances: 12
+    }
+  };
+
+  beforeEach(async () => {
+    const backtestingServiceSpy = {
+      runBacktest: jest.fn()
+    };
+    const historicalDataServiceSpy = {
+      prefetchCommonCoins: jest.fn()
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [
+        BacktestingComponent,
+        ReactiveFormsModule,
+        NoopAnimationsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatProgressBarModule,
+        MatTabsModule,
+        MatTableModule,
+        MatIconModule,
+        MatChipsModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+      ],
+      providers: [
+        { provide: BacktestingService, useValue: backtestingServiceSpy },
+        { provide: HistoricalDataService, useValue: historicalDataServiceSpy }
+      ]
+    }).compileComponents();
+
+    backtestingService = TestBed.inject(BacktestingService);
+    historicalDataService = TestBed.inject(HistoricalDataService);
+    
+    fixture = TestBed.createComponent(BacktestingComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should initialize with default form values', () => {
+    fixture.detectChanges();
+    
+    expect(component.configForm).toBeDefined();
+    expect(component.configForm.get('initialValue')?.value).toBe(10000);
+    expect(component.configForm.get('rebalanceFrequency')?.value).toBe('monthly');
+    expect(component.configForm.get('maxCoins')?.value).toBe(15);
+    expect(component.configForm.get('transactionFeePercent')?.value).toBe(0.5);
+    expect(component.configForm.get('slippagePercent')?.value).toBe(0.1);
+  });
+
+  it('should set default start and end dates on init', () => {
+    fixture.detectChanges();
+    
+    const startDate = component.configForm.get('startDate')?.value;
+    const endDate = component.configForm.get('endDate')?.value;
+    
+    expect(startDate).toBeInstanceOf(Date);
+    expect(endDate).toBeInstanceOf(Date);
+    expect(endDate > startDate).toBeTruthy();
+  });
+
+  it('should call prefetchCommonCoins on init', () => {
+    fixture.detectChanges();
+    
+    expect(historicalDataService.prefetchCommonCoins).toHaveBeenCalled();
+  });
+
+  it('should validate form inputs', () => {
+    fixture.detectChanges();
+    
+    // Test required fields
+    component.configForm.patchValue({
+      startDate: null,
+      endDate: null,
+      initialValue: null
+    });
+    
+    expect(component.configForm.valid).toBeFalsy();
+    expect(component.configForm.get('startDate')?.errors?.['required']).toBeTruthy();
+    expect(component.configForm.get('endDate')?.errors?.['required']).toBeTruthy();
+    expect(component.configForm.get('initialValue')?.errors?.['required']).toBeTruthy();
+  });
+
+  it('should validate minimum investment amount', () => {
+    fixture.detectChanges();
+    
+    component.configForm.patchValue({ initialValue: 50 });
+    
+    expect(component.configForm.get('initialValue')?.errors?.['min']).toBeTruthy();
+  });
+
+  it('should validate coin limits', () => {
+    fixture.detectChanges();
+    
+    component.configForm.patchValue({ maxCoins: 3 });
+    expect(component.configForm.get('maxCoins')?.errors?.['min']).toBeTruthy();
+    
+    component.configForm.patchValue({ maxCoins: 60 });
+    expect(component.configForm.get('maxCoins')?.errors?.['max']).toBeTruthy();
+  });
+
+  it('should not run backtest if form is invalid', () => {
+    fixture.detectChanges();
+    
+    component.configForm.patchValue({ initialValue: null });
+    component.runBacktest();
+    
+    expect(backtestingService.runBacktest).not.toHaveBeenCalled();
+  });
+
+  it('should run backtest with valid configuration', () => {
+    backtestingService.runBacktest.mockReturnValue(of(mockBacktestResult));
+    fixture.detectChanges();
+    
+    component.configForm.patchValue({
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2023-01-01'),
+      initialValue: 10000,
+      rebalanceFrequency: 'monthly',
+      maxCoins: 15,
+      transactionFeePercent: 0.5,
+      slippagePercent: 0.1,
+      excludedCoinsText: 'DOGE, SHIB'
+    });
+    
+    component.runBacktest();
+    
+    expect(component.isRunning).toBeTruthy();
+    expect(backtestingService.runBacktest).toHaveBeenCalledWith(expect.objectContaining({
+      startDate: expect.any(Date),
+      endDate: expect.any(Date),
+      initialValue: 10000,
+      rebalanceFrequency: 'monthly',
+      maxCoins: 15,
+      excludedCoins: ['DOGE', 'SHIB']
+    }));
+  });
+
+  it('should handle successful backtest result', () => {
+    backtestingService.runBacktest.mockReturnValue(of(mockBacktestResult));
+    fixture.detectChanges();
+    
+    component.runBacktest();
+    
+    expect(component.result).toEqual(mockBacktestResult);
+    expect(component.isRunning).toBeFalsy();
+    expect(component.error).toBeNull();
+  });
+
+  it('should handle backtest errors', () => {
+    const error = new Error('Network error');
+    backtestingService.runBacktest.mockReturnValue(throwError(() => error));
+    fixture.detectChanges();
+    
+    component.runBacktest();
+    
+    expect(component.error).toBeTruthy();
+    expect(component.isRunning).toBeFalsy();
+    expect(component.result).toBeNull();
+  });
+
+  it('should update excluded coins when text changes', () => {
+    fixture.detectChanges();
+    
+    component.configForm.patchValue({ excludedCoinsText: 'BTC, ETH, DOGE' });
+    
+    expect(component.excludedCoins).toEqual(['BTC', 'ETH', 'DOGE']);
+  });
+
+  it('should remove coin from excluded list', () => {
+    fixture.detectChanges();
+    
+    component.excludedCoins = ['BTC', 'ETH', 'DOGE'];
+    component.removeCoin('ETH');
+    
+    expect(component.excludedCoins).toEqual(['BTC', 'DOGE']);
+    expect(component.configForm.get('excludedCoinsText')?.value).toBe('BTC, DOGE');
+  });
+
+  it('should format currency correctly', () => {
+    expect(component.formatCurrency(1234.56)).toBe('$1,235');
+    expect(component.formatCurrency(1000000)).toBe('$1,000,000');
+  });
+
+  it('should format percentage correctly', () => {
+    expect(component.formatPercentage(15.67)).toBe('+15.67%');
+    expect(component.formatPercentage(-5.32)).toBe('-5.32%');
+  });
+
+  it('should format date correctly', () => {
+    const formattedDate = component.formatDate('2023-01-15');
+    expect(formattedDate).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
+  });
+
+  it('should get top holdings correctly', () => {
+    const holdings = {
+      'BTC': { amount: 0.5, value: 5000, percentage: 50 },
+      'ETH': { amount: 2, value: 3000, percentage: 30 },
+      'ADA': { amount: 100, value: 2000, percentage: 20 }
+    };
+    
+    const topHoldings = component.getTopHoldings(holdings);
+    expect(topHoldings).toBe('BTC (50.0%), ETH (30.0%), ADA (20.0%)');
+  });
+
+  it('should start new backtest', () => {
+    component.result = mockBacktestResult;
+    component.error = { message: 'Some error', actions: [] };
+    
+    component.startNewBacktest();
+    
+    expect(component.result).toBeNull();
+    expect(component.error).toBeNull();
+  });
+
+  it('should cancel backtest', () => {
+    component.isRunning = true;
+    component.loadingMessage = 'Loading...';
+    
+    component.cancelBacktest();
+    
+    expect(component.isRunning).toBeFalsy();
+    expect(component.loadingMessage).toBe('');
+  });
+
+  it('should handle error actions', () => {
+    jest.spyOn(component, 'runBacktest');
+    jest.spyOn(window.location, 'reload').mockImplementation(() => {});
+    
+    component.handleErrorAction('Try again');
+    expect(component.runBacktest).toHaveBeenCalled();
+    
+    component.handleErrorAction('Refresh the page');
+    expect(window.location.reload).toHaveBeenCalled();
+    
+    component.error = { message: 'Error', actions: [] };
+    component.handleErrorAction('Adjust parameters');
+    expect(component.error).toBeNull();
+  });
+
+  it('should render tab structure correctly', () => {
+    fixture.detectChanges();
+    
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('mat-card-title')?.textContent).toContain('Portfolio Backtesting');
+    expect(compiled.querySelector('mat-card-subtitle')?.textContent)
+      .toContain('Test your rebalancing strategy with historical data');
+  });
+
+  it('should show loading state during backtest', () => {
+    component.isRunning = true;
+    component.loadingMessage = 'Running backtest...';
+    fixture.detectChanges();
+    
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('mat-progress-bar')).toBeTruthy();
+    expect(compiled.querySelector('.loading-text')?.textContent).toContain('Running backtest...');
+  });
+
+  it('should show results after successful backtest', () => {
+    component.result = mockBacktestResult;
+    fixture.detectChanges();
+    
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('.results-container')).toBeTruthy();
+    expect(compiled.querySelector('mat-tab-group')).toBeTruthy();
+  });
+
+  it('should destroy subscriptions on component destroy', () => {
+    const destroySpy = jest.spyOn(component['destroy$'], 'next');
+    const completeSpy = jest.spyOn(component['destroy$'], 'complete');
+    
+    component.ngOnDestroy();
+    
+    expect(destroySpy).toHaveBeenCalled();
+    expect(completeSpy).toHaveBeenCalled();
+  });
+});

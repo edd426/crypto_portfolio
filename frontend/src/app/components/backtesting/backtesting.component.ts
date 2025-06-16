@@ -499,7 +499,7 @@ export class BacktestingComponent implements OnInit, OnDestroy {
           this.loadingMessage = '';
         },
         error: (error) => {
-          console.error('Backtest error:', error);
+          // Error: Backtest failed
           
           const backtestError = error instanceof BacktestingError ? 
             error : 

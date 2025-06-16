@@ -1,0 +1,351 @@
+import { TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
+import { BacktestingService, BacktestConfig, BacktestResult } from '../backtesting.service';
+import { HistoricalDataService, CoinHistoricalData, HistoricalDataPoint } from '../historical-data.service';
+
+describe('BacktestingService', () => {
+  let service: BacktestingService;
+  let historicalDataService: any;
+
+  const mockHistoricalData: { [symbol: string]: CoinHistoricalData } = {
+    'BTC': {
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      coinGeckoId: 'bitcoin',
+      lastUpdated: '2023-01-01',
+      dataPoints: 365,
+      earliestDate: '2022-01-01',
+      latestDate: '2023-01-01',
+      data: [
+        { date: '2022-01-01', price: 47000, marketCap: 890000000000, volume24h: 30000000000 },
+        { date: '2022-02-01', price: 43000, marketCap: 815000000000, volume24h: 25000000000 },
+        { date: '2022-03-01', price: 45000, marketCap: 852000000000, volume24h: 28000000000 },
+        { date: '2022-12-31', price: 16500, marketCap: 318000000000, volume24h: 15000000000 }
+      ]
+    },
+    'ETH': {
+      symbol: 'ETH',
+      name: 'Ethereum',
+      coinGeckoId: 'ethereum',
+      lastUpdated: '2023-01-01',
+      dataPoints: 365,
+      earliestDate: '2022-01-01',
+      latestDate: '2023-01-01',
+      data: [
+        { date: '2022-01-01', price: 3700, marketCap: 445000000000, volume24h: 15000000000 },
+        { date: '2022-02-01', price: 2800, marketCap: 337000000000, volume24h: 12000000000 },
+        { date: '2022-03-01', price: 3200, marketCap: 385000000000, volume24h: 14000000000 },
+        { date: '2022-12-31', price: 1200, marketCap: 147000000000, volume24h: 8000000000 }
+      ]
+    },
+    'ADA': {
+      symbol: 'ADA',
+      name: 'Cardano',
+      coinGeckoId: 'cardano',
+      lastUpdated: '2023-01-01',
+      dataPoints: 365,
+      earliestDate: '2022-01-01',
+      latestDate: '2023-01-01',
+      data: [
+        { date: '2022-01-01', price: 1.35, marketCap: 45000000000, volume24h: 2000000000 },
+        { date: '2022-02-01', price: 1.05, marketCap: 35500000000, volume24h: 1500000000 },
+        { date: '2022-03-01', price: 1.15, marketCap: 38700000000, volume24h: 1800000000 },
+        { date: '2022-12-31', price: 0.25, marketCap: 8500000000, volume24h: 500000000 }
+      ]
+    }
+  };
+
+  const mockConfig: BacktestConfig = {
+    startDate: new Date('2022-01-01'),
+    endDate: new Date('2022-12-31'),
+    initialValue: 10000,
+    rebalanceFrequency: 'monthly',
+    transactionFeePercent: 0.5,
+    slippagePercent: 0.1,
+    maxCoins: 3,
+    excludedCoins: []
+  };
+
+  beforeEach(() => {
+    const historicalDataServiceSpy = {
+      getAvailableCoins: jest.fn(),
+      getMultipleCoinData: jest.fn()
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        BacktestingService,
+        { provide: HistoricalDataService, useValue: historicalDataServiceSpy }
+      ]
+    });
+
+    service = TestBed.inject(BacktestingService);
+    historicalDataService = TestBed.inject(HistoricalDataService);
+
+    // Setup default mocks
+    historicalDataService.getAvailableCoins.mockReturnValue(['BTC', 'ETH', 'ADA']);
+    historicalDataService.getMultipleCoinData.mockReturnValue(of(mockHistoricalData));
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should run backtest successfully', (done) => {
+    service.runBacktest(mockConfig).subscribe(result => {
+      expect(result).toBeDefined();
+      expect(result.config).toEqual(mockConfig);
+      expect(result.portfolioHistory).toBeDefined();
+      expect(result.portfolioHistory.length).toBeGreaterThan(0);
+      expect(result.rebalanceEvents).toBeDefined();
+      expect(result.metrics).toBeDefined();
+      done();
+    });
+  });
+
+  it('should handle excluded coins', (done) => {
+    const configWithExclusions: BacktestConfig = {
+      ...mockConfig,
+      excludedCoins: ['ADA']
+    };
+
+    service.runBacktest(configWithExclusions).subscribe(result => {
+      expect(result).toBeDefined();
+      // Should only have BTC and ETH in portfolio, not ADA
+      const finalSnapshot = result.portfolioHistory[result.portfolioHistory.length - 1];
+      expect(finalSnapshot.holdings['ADA']).toBeUndefined();
+      done();
+    });
+  });
+
+  it('should calculate metrics correctly', (done) => {
+    service.runBacktest(mockConfig).subscribe(result => {
+      const metrics = result.metrics;
+      
+      expect(metrics.totalReturn).toBeDefined();
+      expect(typeof metrics.totalReturn).toBe('number');
+      expect(metrics.annualizedReturn).toBeDefined();
+      expect(typeof metrics.annualizedReturn).toBe('number');
+      expect(metrics.volatility).toBeDefined();
+      expect(typeof metrics.volatility).toBe('number');
+      expect(metrics.sharpeRatio).toBeDefined();
+      expect(typeof metrics.sharpeRatio).toBe('number');
+      expect(metrics.maxDrawdown).toBeDefined();
+      expect(typeof metrics.maxDrawdown).toBe('number');
+      expect(metrics.winRate).toBeDefined();
+      expect(typeof metrics.winRate).toBe('number');
+      expect(metrics.totalFees).toBeDefined();
+      expect(typeof metrics.totalFees).toBe('number');
+      expect(metrics.numberOfRebalances).toBeDefined();
+      expect(typeof metrics.numberOfRebalances).toBe('number');
+      
+      done();
+    });
+  });
+
+  it('should generate rebalancing dates correctly', () => {
+    // Access private method for testing
+    const generateRebalanceDates = (service as any).generateRebalanceDates.bind(service);
+    
+    // Test monthly frequency
+    const monthlyDates = generateRebalanceDates({
+      ...mockConfig,
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2022-03-01'),
+      rebalanceFrequency: 'monthly'
+    });
+    
+    expect(monthlyDates.length).toBeGreaterThanOrEqual(3);
+    expect(monthlyDates[0]).toBe('2022-01-01');
+    expect(monthlyDates).toContain('2022-03-01');
+
+    // Test quarterly frequency
+    const quarterlyDates = generateRebalanceDates({
+      ...mockConfig,
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2022-12-31'),
+      rebalanceFrequency: 'quarterly'
+    });
+    
+    expect(quarterlyDates.length).toBeGreaterThanOrEqual(5);
+    expect(quarterlyDates[0]).toBe('2022-01-01');
+
+    // Test yearly frequency
+    const yearlyDates = generateRebalanceDates({
+      ...mockConfig,
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2024-01-01'),
+      rebalanceFrequency: 'yearly'
+    });
+    
+    expect(yearlyDates.length).toBeGreaterThanOrEqual(3);
+    expect(yearlyDates[0]).toBe('2022-01-01');
+  });
+
+  it('should initialize portfolio correctly', () => {
+    const initializePortfolio = (service as any).initializePortfolio.bind(service);
+    
+    const portfolio = initializePortfolio(mockConfig, mockHistoricalData, '2022-01-01');
+    
+    expect(portfolio).toBeDefined();
+    expect(Object.keys(portfolio).length).toBeLessThanOrEqual(mockConfig.maxCoins);
+    
+    // Check that portfolio allocation adds up to approximately initial value
+    const totalValue = Object.entries(portfolio).reduce((sum, [symbol, amount]) => {
+      const price = mockHistoricalData[symbol].data[0].price;
+      return sum + (amount as number * price);
+    }, 0);
+    
+    expect(totalValue).toBeCloseTo(mockConfig.initialValue, -2); // Within $100
+  });
+
+  it('should get top coins by market cap correctly', () => {
+    const getTopCoinsByMarketCap = (service as any).getTopCoinsByMarketCap.bind(service);
+    
+    const topCoins = getTopCoinsByMarketCap(mockHistoricalData, '2022-01-01', 2);
+    
+    expect(topCoins).toEqual(['BTC', 'ETH']); // Should be ordered by market cap
+    expect(topCoins.length).toBe(2);
+  });
+
+  it('should find nearest data point correctly', () => {
+    const findNearestDataPoint = (service as any).findNearestDataPoint.bind(service);
+    
+    const dataPoints = mockHistoricalData['BTC'].data;
+    const nearestPoint = findNearestDataPoint(dataPoints, '2022-01-15');
+    
+    expect(nearestPoint).toBeDefined();
+    expect(nearestPoint.date).toBe('2022-01-01'); // Should find closest date
+  });
+
+  it('should calculate portfolio value correctly', () => {
+    const calculatePortfolioValue = (service as any).calculatePortfolioValue.bind(service);
+    
+    const portfolio = { 'BTC': 0.1, 'ETH': 1 };
+    const value = calculatePortfolioValue(portfolio, '2022-01-01', mockHistoricalData);
+    
+    const expectedValue = (0.1 * 47000) + (1 * 3700); // BTC + ETH values
+    expect(value).toBe(expectedValue);
+  });
+
+  it('should create portfolio snapshot correctly', () => {
+    const createPortfolioSnapshot = (service as any).createPortfolioSnapshot.bind(service);
+    
+    const portfolio = { 'BTC': 0.1, 'ETH': 1 };
+    const snapshot = createPortfolioSnapshot('2022-01-01', portfolio, mockHistoricalData);
+    
+    expect(snapshot.date).toBe('2022-01-01');
+    expect(snapshot.totalValue).toBeGreaterThan(0);
+    expect(snapshot.holdings['BTC']).toBeDefined();
+    expect(snapshot.holdings['ETH']).toBeDefined();
+    expect(snapshot.holdings['BTC'].percentage).toBeCloseTo(
+      (snapshot.holdings['BTC'].value / snapshot.totalValue) * 100, 1
+    );
+  });
+
+  it('should handle rebalancing logic correctly', () => {
+    const performRebalancing = (service as any).performRebalancing.bind(service);
+    
+    const portfolio = { 'BTC': 0.2, 'ETH': 2 };
+    const rebalanceEvent = performRebalancing(portfolio, '2022-02-01', mockConfig, mockHistoricalData);
+    
+    if (rebalanceEvent) {
+      expect(rebalanceEvent.date).toBe('2022-02-01');
+      expect(rebalanceEvent.beforeValue).toBeGreaterThan(0);
+      expect(rebalanceEvent.afterValue).toBeLessThanOrEqual(rebalanceEvent.beforeValue);
+      expect(rebalanceEvent.trades).toBeDefined();
+      expect(rebalanceEvent.fees).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('should handle error when historical data service fails', (done) => {
+    historicalDataService.getMultipleCoinData.and.returnValue(
+      throwError(() => new Error('Network error'))
+    );
+
+    service.runBacktest(mockConfig).subscribe({
+      next: () => {
+        fail('Should not succeed when historical data service fails');
+      },
+      error: (error) => {
+        expect(error).toBeDefined();
+        done();
+      }
+    });
+  });
+
+  it('should handle empty coin data', (done) => {
+    historicalDataService.getMultipleCoinData.and.returnValue(of({}));
+
+    service.runBacktest(mockConfig).subscribe({
+      next: (result) => {
+        // Should handle gracefully with empty data
+        expect(result).toBeDefined();
+        expect(result.portfolioHistory.length).toBe(0);
+        done();
+      },
+      error: () => {
+        // Or should error appropriately
+        done();
+      }
+    });
+  });
+
+  it('should handle invalid date ranges', () => {
+    const invalidConfig: BacktestConfig = {
+      ...mockConfig,
+      startDate: new Date('2023-01-01'),
+      endDate: new Date('2022-01-01') // End before start
+    };
+
+    service.runBacktest(invalidConfig).subscribe({
+      next: (result) => {
+        // Should handle gracefully or produce empty result
+        expect(result).toBeDefined();
+      },
+      error: (error) => {
+        // Or should error appropriately
+        expect(error).toBeDefined();
+      }
+    });
+  });
+
+  it('should respect transaction fees and slippage', (done) => {
+    const highFeeConfig: BacktestConfig = {
+      ...mockConfig,
+      transactionFeePercent: 5.0,
+      slippagePercent: 2.0
+    };
+
+    service.runBacktest(highFeeConfig).subscribe(result => {
+      // Higher fees should result in lower performance
+      expect(result.metrics.totalFees).toBeGreaterThan(0);
+      
+      // Check that fees are applied to trades
+      if (result.rebalanceEvents.length > 0) {
+        const firstRebalance = result.rebalanceEvents[0];
+        expect(firstRebalance.fees).toBeGreaterThan(0);
+        
+        // Verify fee calculation
+        const totalTradeValue = firstRebalance.trades.reduce((sum, trade) => sum + trade.value, 0);
+        const expectedFeeRate = (highFeeConfig.transactionFeePercent + highFeeConfig.slippagePercent) / 100;
+        expect(firstRebalance.fees).toBeCloseTo(totalTradeValue * expectedFeeRate, -1);
+      }
+      
+      done();
+    });
+  });
+
+  it('should handle different rebalancing frequencies', (done) => {
+    const yearlyConfig: BacktestConfig = {
+      ...mockConfig,
+      rebalanceFrequency: 'yearly'
+    };
+
+    service.runBacktest(yearlyConfig).subscribe(result => {
+      // Yearly rebalancing should have fewer rebalance events
+      expect(result.rebalanceEvents.length).toBeLessThan(13); // Less than monthly
+      done();
+    });
+  });
+});

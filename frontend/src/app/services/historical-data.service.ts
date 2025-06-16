@@ -76,7 +76,7 @@ export class HistoricalDataService {
 
     return forkJoin(requests).pipe(
       catchError(error => {
-        console.error('Error fetching multiple coin data:', error);
+        // Error: Failed to fetch multiple coin data
         // Return partial results instead of failing completely
         return of({});
       })
@@ -202,8 +202,8 @@ export class HistoricalDataService {
     
     commonCoins.forEach(symbol => {
       this.getCoinHistoricalData(symbol).subscribe({
-        next: () => console.log(`Prefetched data for ${symbol}`),
-        error: (error) => console.warn(`Failed to prefetch ${symbol}:`, error)
+        next: () => {}, // Prefetched data successfully
+        error: (error) => {} // Failed to prefetch data
       });
     });
   }
@@ -267,7 +267,7 @@ export class HistoricalDataService {
       errorMessage = `Access denied for ${symbol} data. Please check CORS configuration.`;
     }
 
-    console.error(`Historical data error for ${symbol}:`, error);
+    // Error: Historical data fetch failed for symbol
     return throwError(() => new Error(errorMessage));
   }
 }

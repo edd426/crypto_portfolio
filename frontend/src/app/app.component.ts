@@ -176,7 +176,7 @@ export class AppComponent implements OnInit {
             }
           },
           error: (error) => {
-            console.error('Failed to get top coins for exclusion feedback:', error);
+            // Error: Failed to get top coins for exclusion feedback
             // Fallback to using target allocations 
             const topPortfolioCoins = result.targetAllocations.map(allocation => allocation.symbol);
             if (this.portfolioEntryComponent) {

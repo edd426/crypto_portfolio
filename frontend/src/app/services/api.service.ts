@@ -58,7 +58,7 @@ export class ApiService {
           };
         }),
         catchError(error => {
-          console.error('Error fetching top coins:', error);
+          // Error: Failed to fetch top coins
           throw error;
         })
       );
@@ -96,7 +96,7 @@ export class ApiService {
           return { data: result };
         }),
         catchError(error => {
-          console.error('Error fetching coin prices:', error);
+          // Error: Failed to fetch coin prices
           throw error;
         })
       );
@@ -115,7 +115,7 @@ export class ApiService {
           }))
         })),
         catchError(error => {
-          console.error('Error searching coins:', error);
+          // Error: Failed to search coins
           throw error;
         })
       );
