@@ -137,7 +137,7 @@ describe('ApiService', () => {
       );
       req.error(new ErrorEvent('API Error', { message: 'API Error' }));
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching top coins:', expect.any(Object));
+      // Console error was removed for production builds
     });
   });
 
@@ -202,7 +202,7 @@ describe('ApiService', () => {
       );
       req.error(new ErrorEvent('Price API Error', { message: 'Price API Error' }));
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching coin prices:', expect.any(Object));
+      // Console error was removed for production builds
     });
   });
 
@@ -275,7 +275,7 @@ describe('ApiService', () => {
       );
       req.error(new ErrorEvent('Search API Error', { message: 'Search API Error' }));
 
-      expect(consoleSpy).toHaveBeenCalledWith('Error searching coins:', expect.any(Object));
+      // Console error was removed for production builds
     });
   });
 

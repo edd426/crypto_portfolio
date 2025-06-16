@@ -132,7 +132,7 @@ describe('PortfolioEntryComponent - Dropdown Exclusion', () => {
     component['loadTopCoins']();
     tick();
 
-    expect(console.error).toHaveBeenCalled();
+    // Console error was removed for production builds
     expect(component.availableCoinsForExclusion.length).toBeGreaterThan(0);
     expect(component.availableCoinsForExclusion[0].symbol).toBe('BTC');
   }));

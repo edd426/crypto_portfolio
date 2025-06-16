@@ -283,7 +283,7 @@ describe('AppComponent', () => {
       
       component.onPortfolioSubmitted(mockPortfolio);
       
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to get top coins for exclusion feedback:', expect.any(Error));
+      // Console error was removed for production builds
       expect(mockPortfolioEntryComponent.updateTopPortfolioCoins).toHaveBeenCalledWith(['BTC', 'ETH']);
     });
 
