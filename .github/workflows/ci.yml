@@ -37,7 +37,7 @@ jobs:
     - name: Run frontend tests
       run: |
         cd frontend
-        npm run test:coverage -- --passWithNoTests --collectCoverage --coverageThreshold={}
+        npm run test:coverage:ci
     
     - name: Upload frontend coverage to Codecov
       uses: codecov/codecov-action@v3
