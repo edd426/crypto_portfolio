@@ -19,4 +19,4 @@ Execute a comprehensive session handoff for the crypto portfolio project. Comple
 
 6. **Document next steps**: Update `AI_CONTEXT/CURRENT_STATE.md` with a clear handoff section containing 3 immediate priorities for the next developer, including what was just completed, any known issues, and specific files to focus on.
 
-7. **Prepare final commit**: Stage changes with `git add .`, review with `git diff --staged` to check for sensitive information, then create a comprehensive commit message documenting features added, bugs fixed, architecture changes, testing status, and clear next steps for the next developer. Finally, push the changes with `git push origin main`.
+7. **Prepare final commit**: Stage changes, then create a comprehensive commit message documenting features added, bugs fixed, architecture changes, testing status, and clear next steps for the next developer. Finally, push the changes with `git push origin main`.

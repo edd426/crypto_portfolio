@@ -1,11 +1,12 @@
 # CURRENT_STATE.md
 *Single source of truth for project status*
 
-## ✅ DEPLOYMENT STATUS (Updated: June 8, 2025)
+## ✅ DEPLOYMENT STATUS (Updated: June 16, 2025)
 **Phase 1**: COMPLETE and LIVE  
 **Live URL**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net  
 **Cost**: $0/month operational (99% reduction achieved)  
-**Documentation**: AI-optimized structure implemented
+**CI/CD**: GitHub Actions passing (105/105 tests)
+**Production**: Stable deployment v1.0.1
 
 ## 🚀 IMMEDIATE NEXT PRIORITIES
 
@@ -16,18 +17,22 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 4. **Advanced metrics** (rolling Sharpe, correlation analysis)
 5. **Export functionality** (CSV, PDF reports)
 
-## 📝 RECENT SESSION NOTES
-- **What was completed**: Test Suite Modernization for client-side architecture (105/105 tests passing)
-- **Known issues**: Test coverage at 57.3% (target: 70%), backend tests removed entirely
-- **Next logical features**: Expand backtesting to all 97 coins, add performance optimizations
-- **Testing notes**: All linting passes, Jest framework modernized, Angular testing stabilized
+## 📝 RECENT SESSION NOTES (June 16, 2025)
+- **What was completed**: Critical deployment fixes, production stability improvements, CI/CD pipeline repair
+- **Major issues resolved**: Corrupted HTML deployment causing website hangs, CI test failures, production console errors
+- **Current status**: Website loads correctly with JavaScript, GitHub Actions passing, production deployment stable
+- **Known issues**: Historical Backtesting tab not visible in production (renders in build but missing from UI)
+- **Testing notes**: All tests pass (105/105), linting clean, coverage at 57.4%
 
-## 📁 FILES MODIFIED RECENTLY
-- `frontend/src/app/__tests__/app.component.spec.ts` - NEW: Complete App Component test suite (31 tests)
-- `frontend/src/app/utils/__tests__/error-handler.util.spec.ts` - NEW: Error Handler test suite (9 tests)  
-- `frontend/src/app/services/__tests__/api.service.spec.ts` - UPDATED: Client-side API tests, removed backend expectations
-- `backend/src/__tests__/` - REMOVED: All backend tests (9 files deleted for client-side architecture)
-- `test-all.sh` - UPDATED: Frontend-only test execution, removed backend test dependencies
+## 📁 FILES MODIFIED RECENTLY (June 16, 2025)
+- `frontend/src/app/app.component.ts` - UPDATED: Version bump to v1.0.1, deployment fixes
+- `frontend/src/app/__tests__/app.component.spec.ts` - UPDATED: Pattern-based version testing for maintainability
+- `frontend/src/app/components/backtesting/backtesting.component.ts` - UPDATED: Added defensive error handling for initialization
+- `frontend/src/app/services/api.service.ts` - UPDATED: Removed console statements causing production hangs
+- `frontend/src/app/services/backtesting.service.ts` - UPDATED: Removed debug console statements
+- `frontend/src/app/components/rebalancing-results/rebalancing-results.component.ts` - UPDATED: Removed debug console statements
+- `.github/workflows/ci.yml` - UPDATED: Fixed CI pipeline for frontend-only architecture
+- `frontend/package.json` - UPDATED: Added test:coverage:ci script, increased bundle budget
 
 ## 🏗️ ARCHITECTURE
 - **Client-side only**: No backend deployment
@@ -79,41 +84,45 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 
 ---
 
-## 🚀 HANDOFF NOTES (Updated: June 14, 2025)
+## 🚀 HANDOFF NOTES (Updated: June 16, 2025)
 
 ### **What Was Just Completed**
-- **Test Suite Modernization**: Complete client-side test architecture (105/105 tests passing)
-- **Framework Migration**: Converted from mixed Jest/Jasmine to pure Jest testing framework
-- **Backend Cleanup**: Removed all backend tests (9 test files) for client-side only architecture  
-- **New Test Suites**: Added comprehensive App Component (31 tests) and Error Handler (9 tests) coverage
-- **HttpClient Fixes**: Resolved Angular dependency injection issues in testing environment
+- **Critical Production Fixes**: Resolved corrupted HTML deployment causing website hangs and JavaScript load failures
+- **CI/CD Pipeline Repair**: Fixed GitHub Actions failures, all tests now passing (105/105)
+- **Console Statement Cleanup**: Removed production-breaking console.log statements from core services
+- **Deployment Stability**: Achieved stable production deployment with proper JavaScript loading
+- **Error Handling Enhancement**: Added defensive initialization error handling to BacktestingComponent
+- **Test Maintainability**: Converted hardcoded version tests to pattern-based regex for future-proofing
 
 ### **Immediate Priorities for Next Developer**
 
-#### 1. **Improve Test Coverage to 70%** (Priority: HIGH)
-- **Current**: 57.3% statements, 40.39% branches (target: 70%)
-- **Focus Areas**: Backtesting Service (4.16% coverage), Historical Data Service (27.38% coverage)
+#### 1. **CRITICAL: Fix Historical Backtesting Tab Visibility** (Priority: URGENT)
+- **Issue**: Tab exists in template and builds successfully but doesn't render in production UI
+- **Investigation**: BacktestingComponent may be failing silently during runtime initialization
+- **Files**: `frontend/src/app/components/backtesting/backtesting.component.ts`, `frontend/src/app/app.component.ts`
+- **Action**: Debug runtime component loading, check browser console for errors, verify Material Design tab rendering
+- **Impact**: Core feature completely inaccessible to users despite infrastructure being ready
+
+#### 2. **Improve Test Coverage to 70%** (Priority: HIGH)
+- **Current**: 57.4% statements, 39.37% branches (target: 70%)
+- **Focus Areas**: Backtesting Service (4.21% coverage), Historical Data Service (28.75% coverage)
 - **Files**: `frontend/src/app/services/backtesting.service.ts`, `frontend/src/app/services/historical-data.service.ts`
 - **Action**: Add comprehensive test suites for remaining uncovered services
 - **Impact**: Meet project test coverage requirements and improve code reliability
 
-#### 2. **Phase 2 Backtesting Enhancement** (Priority: MEDIUM)  
-- **Current**: Basic backtesting infrastructure ready with 97 cryptocurrencies, solid test foundation
-- **Files**: `frontend/src/app/services/backtesting.service.ts`
-- **Action**: Expand beyond current 5-coin limitation to use all available historical data
+#### 3. **Phase 2 Backtesting Enhancement** (Priority: MEDIUM)  
+- **Current**: Component exists with error handling but tab not visible to users
+- **Action**: Once tab visibility is fixed, expand beyond current limitations to use all available historical data
 - **Impact**: Unlock full potential of existing data infrastructure
 
-#### 3. **Performance Optimization** (Priority: LOW)
-- **Current**: Client-side calculations work well for small portfolios
-- **Action**: Optimize for larger portfolios (20+ coins) and complex backtesting scenarios
-- **Impact**: Better user experience for advanced portfolio analysis
-
 ### **Known Issues**
-- **Test Coverage Gap**: Need additional 12.7% coverage to reach 70% target
+- **BLOCKING**: Historical Backtesting tab not visible in production despite successful builds
+- **Test Coverage Gap**: Need additional 12.6% coverage to reach 70% target  
 - **Bundle Size Warning**: 1.09 MB bundle (expected for Angular Material, not blocking)
-- **Live Application**: Fully functional at production URL
+- **Production Status**: Portfolio Analysis works perfectly, Backtesting tab missing from UI
 
 ### **Files to Focus On**
-- **Primary**: `frontend/src/app/services/backtesting.service.ts` (add tests + features)
-- **Secondary**: `frontend/src/app/services/historical-data.service.ts` (add tests)
-- **Reference**: `frontend/src/app/__tests__/app.component.spec.ts` (test pattern examples)
+- **URGENT**: `frontend/src/app/components/backtesting/backtesting.component.ts` (fix runtime loading issue)
+- **Primary**: `frontend/src/app/app.component.ts` (investigate tab group rendering)
+- **Secondary**: `frontend/src/app/services/backtesting.service.ts` (add tests once tab is visible)
+- **Reference**: Browser developer console in production for component loading errors

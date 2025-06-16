@@ -1,8 +1,8 @@
 # CLAUDE.md - AI Agent Instructions
 
 ## 🎯 Project: Crypto Portfolio Analyzer
-**Status**: Phase 2 Complete | **Cost**: $0/month operational | **Architecture**: Client-side only  
-**Live**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
+**Status**: Phase 1 Complete, Phase 2 Deployment Issues | **Cost**: $0/month operational | **Architecture**: Client-side only  
+**Live**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net (Backtesting tab issue)
 
 ## 🚀 Quick Start
 ```bash
@@ -31,5 +31,5 @@ npm run lint                   # Code quality check
 - **API**: Direct CoinGecko integration (free tier, rate limited)
 - **Hosting**: Azure Static Web App
 - **Data**: Azure Blob Storage (97 cryptocurrencies, 1 year historical data)
-- **Testing**: Jest (105/105 tests passing, 57.3% coverage)
+- **Testing**: Jest (105/105 tests passing, 57.4% coverage)
 
