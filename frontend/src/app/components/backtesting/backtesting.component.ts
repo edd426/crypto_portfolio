@@ -410,25 +410,38 @@ export class BacktestingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Prefetch common coin data
-    this.historicalDataService.prefetchCommonCoins();
-    
-    // Set default dates
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 2); // Default to 2 years
-    
-    this.configForm.patchValue({
-      startDate,
-      endDate
-    });
-
-    // Watch excluded coins text changes
-    this.configForm.get('excludedCoinsText')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => {
-        this.updateExcludedCoins(value);
+    try {
+      // Prefetch common coin data (but don't let it block initialization)
+      try {
+        this.historicalDataService.prefetchCommonCoins();
+      } catch (error) {
+        console.warn('Failed to prefetch common coins:', error);
+      }
+      
+      // Set default dates
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setFullYear(startDate.getFullYear() - 2); // Default to 2 years
+      
+      this.configForm.patchValue({
+        startDate,
+        endDate
       });
+
+      // Watch excluded coins text changes
+      this.configForm.get('excludedCoinsText')?.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(value => {
+          this.updateExcludedCoins(value);
+        });
+    } catch (error) {
+      console.error('Error initializing BacktestingComponent:', error);
+      // Set a basic error state but don't crash the component
+      this.error = {
+        message: 'Failed to initialize backtesting component',
+        actions: ['Refresh the page']
+      };
+    }
   }
 
   ngOnDestroy(): void {
