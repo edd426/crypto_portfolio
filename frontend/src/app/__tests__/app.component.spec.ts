@@ -169,11 +169,9 @@ describe('AppComponent', () => {
 
   describe('API Health Check', () => {
     it('should handle successful health check', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      
       fixture.detectChanges();
       
-      expect(consoleSpy).toHaveBeenCalledWith('API Status:', 'healthy');
+      expect(mockApiService.checkHealth).toHaveBeenCalled();
     });
 
     it('should show error message when API health check fails', () => {
@@ -292,12 +290,10 @@ describe('AppComponent', () => {
     it('should handle rebalancing calculation error', () => {
       const error = new Error('rate limit exceeded');
       mockApiService.calculateRebalancing.mockReturnValue(throwError(() => error));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       
       component.onPortfolioSubmitted(mockPortfolio);
       
       expect(component.isCalculating).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith('Rebalancing calculation failed:', error);
       expect(mockSnackBar.open).toHaveBeenCalledWith(
         'rate limit exceeded',
         'Dismiss',

@@ -106,6 +106,7 @@ export class AppComponent implements OnInit {
   currentPortfolio: Portfolio | null = null;
   rebalanceResult: RebalanceResult | null = null;
   isCalculating = false;
+  private debugLevel = Number(localStorage.getItem('portfolioDebugLevel')) || 0;
 
   constructor(
     private apiService: ApiService,
@@ -121,7 +122,7 @@ export class AppComponent implements OnInit {
   private checkApiHealth(): void {
     this.apiService.checkHealth().subscribe({
       next: (health) => {
-        console.log('API Status:', health.status);
+        this.debugLog(3, 'API Status:', health.status);
       },
       error: (error) => {
         this.snackBar.open('Backend API is not available. Please ensure the server is running.', 'Dismiss', {
@@ -190,7 +191,7 @@ export class AppComponent implements OnInit {
       },
       error: (error) => {
         this.isCalculating = false;
-        console.error('Rebalancing calculation failed:', error);
+        this.debugLog(1, 'Rebalancing calculation failed:', error);
         
         // Extract specific error message from the backend
         let errorMessage = 'Failed to calculate rebalancing. Please try again.';
@@ -233,5 +234,12 @@ export class AppComponent implements OnInit {
 
     // Also update the current URL
     this.portfolioUrlService.savePortfolioToUrl(portfolio);
+  }
+
+  private debugLog(level: number, ...args: any[]): void {
+    if (this.debugLevel >= level) {
+      const prefix = level === 1 ? '[ERROR]' : level === 2 ? '[WARN]' : level === 3 ? '[INFO]' : '[DEBUG]';
+      console.log(prefix, ...args);
+    }
   }
 }
