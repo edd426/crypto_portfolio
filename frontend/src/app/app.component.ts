@@ -30,7 +30,7 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
     <mat-toolbar color="primary">
       <span>Crypto Portfolio Analyzer</span>
       <span class="spacer"></span>
-      <span class="version">v1.0.0</span>
+      <span class="version">v1.0.1</span>
     </mat-toolbar>
 
     <div class="container">
