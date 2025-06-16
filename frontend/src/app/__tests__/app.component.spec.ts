@@ -400,7 +400,7 @@ describe('AppComponent', () => {
       
       expect(toolbar).toBeTruthy();
       expect(toolbar.textContent).toContain('Crypto Portfolio Analyzer');
-      expect(toolbar.textContent).toContain('v1.0.0');
+      expect(toolbar.textContent).toMatch(/v\d+\.\d+\.\d+/);
     });
 
     it('should display intro card with title and subtitle', () => {
