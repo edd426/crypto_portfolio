@@ -281,7 +281,7 @@ export class BacktestingErrorHandler {
   static logError(error: BacktestingError, context?: string): void {
     const debugLevel = Number(localStorage.getItem('portfolioDebugLevel')) || 0;
     
-    if (debugLevel >= 1) { // Error level
+    if (debugLevel >= 1 && typeof window !== 'undefined' && window.location.hostname === 'localhost') { // Error level
       console.error(`[BACKTEST ERROR]${context ? ` ${context}` : ''}:`, {
         code: error.details.code,
         message: error.details.message,

@@ -72,7 +72,7 @@ export class BacktestingService {
    * Run a complete backtest simulation
    */
   runBacktest(config: BacktestConfig): Observable<BacktestResult> {
-    console.log('🚀 Starting backtest with config:', config);
+    // Debug: Starting backtest
 
     return this.validateAndPrepareData(config).pipe(
       switchMap(({ coinData, rebalanceDates }) => {
@@ -119,7 +119,7 @@ export class BacktestingService {
           metrics
         };
 
-        console.log('✅ Backtest completed:', result);
+        // Debug: Backtest completed
         return of(result);
       })
     );

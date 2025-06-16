@@ -237,7 +237,7 @@ export class AppComponent implements OnInit {
   }
 
   private debugLog(level: number, ...args: any[]): void {
-    if (this.debugLevel >= level) {
+    if (this.debugLevel >= level && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       const prefix = level === 1 ? '[ERROR]' : level === 2 ? '[WARN]' : level === 3 ? '[INFO]' : '[DEBUG]';
       console.log(prefix, ...args);
     }
