@@ -3,9 +3,10 @@ Quick project onboarding for the crypto portfolio analyzer. Read the AI context 
 ## 🎯 Onboarding Tasks
 
 ### 1. **Read AI Context Documentation**
-Read each file in the AI_CONTEXT directory:
+Read AI context files in priority order (AGENT_GUIDELINES first):
 
 ```bash
+cat AI_CONTEXT/AGENT_GUIDELINES.md
 cat AI_CONTEXT/CURRENT_STATE.md
 cat AI_CONTEXT/CONSTRAINTS.md  
 cat AI_CONTEXT/CODE_PATTERNS.md
@@ -40,7 +41,7 @@ Based on CURRENT_STATE.md, what should be implemented next and why.
 
 ## ✅ Onboarding Complete
 
-- [ ] Read all 5 AI_CONTEXT files
+- [ ] Read all 6 AI_CONTEXT files (AGENT_GUIDELINES first)
 - [ ] Understand project purpose and current state
 - [ ] Checked live application functionality
 - [ ] Provided onboarding summary with next steps

@@ -68,6 +68,9 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
 
         <mat-tab label="Historical Backtesting">
           <div class="tab-content">
+            <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc;">
+              <strong>DEBUG: Historical Backtesting Tab Loaded</strong> - If you see this, the tab is rendering
+            </div>
             <app-backtesting></app-backtesting>
           </div>
         </mat-tab>
@@ -115,8 +118,10 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('AppComponent: ngOnInit started');
     this.checkApiHealth();
     this.loadPortfolioFromUrl();
+    console.log('AppComponent: ngOnInit completed');
   }
 
   private checkApiHealth(): void {
