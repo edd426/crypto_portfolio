@@ -9,7 +9,7 @@ import { ApiService } from '../services/api.service';
 import { PortfolioUrlService } from '../services/portfolio-url.service';
 import { PortfolioEntryComponent } from '../components/portfolio-entry/portfolio-entry.component';
 import { RebalancingResultsComponent } from '../components/rebalancing-results/rebalancing-results.component';
-// import { BacktestingComponent } from '../components/backtesting/backtesting.component';
+import { BacktestingComponent } from '../components/backtesting/backtesting.component';
 import { Portfolio, RebalanceResult } from '../models/portfolio.model';
 
 describe('AppComponent', () => {
@@ -109,8 +109,8 @@ describe('AppComponent', () => {
         NoopAnimationsModule,
         HttpClientTestingModule,
         PortfolioEntryComponent,
-        RebalancingResultsComponent
-        // BacktestingComponent
+        RebalancingResultsComponent,
+        BacktestingComponent
       ],
       providers: [
         { provide: ApiService, useValue: apiServiceSpy },
@@ -399,7 +399,7 @@ describe('AppComponent', () => {
       const toolbar = compiled.querySelector('mat-toolbar');
       
       expect(toolbar).toBeTruthy();
-      expect(toolbar.textContent).toContain('🚨 DEPLOYMENT TEST 🚨');
+      expect(toolbar.textContent).toContain('Crypto Portfolio Analyzer');
       expect(toolbar.textContent).toMatch(/v\d+\.\d+\.\d+/);
     });
 
@@ -417,8 +417,8 @@ describe('AppComponent', () => {
       const tabGroup = compiled.querySelector('mat-tab-group');
       
       expect(tabGroup).toBeTruthy();
-      expect(compiled.textContent).toContain('TEST TAB 1');
-      expect(compiled.textContent).toContain('TEST TAB 2');
+      expect(compiled.textContent).toContain('Portfolio Analysis');
+      expect(compiled.textContent).toContain('Historical Backtesting');
     });
 
     it('should show portfolio entry component in Portfolio Analysis tab', () => {

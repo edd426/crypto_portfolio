@@ -8,7 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 import { PortfolioEntryComponent } from './components/portfolio-entry/portfolio-entry.component';
 import { RebalancingResultsComponent } from './components/rebalancing-results/rebalancing-results.component';
-// import { BacktestingComponent } from './components/backtesting/backtesting.component';
+import { BacktestingComponent } from './components/backtesting/backtesting.component';
 import { Portfolio, RebalanceResult } from './models/portfolio.model';
 import { ApiService } from './services/api.service';
 import { PortfolioUrlService } from './services/portfolio-url.service';
@@ -23,12 +23,12 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
     MatProgressSpinnerModule,
     MatTabsModule,
     PortfolioEntryComponent,
-    RebalancingResultsComponent
-    // BacktestingComponent
+    RebalancingResultsComponent,
+    BacktestingComponent
   ],
   template: `
     <mat-toolbar color="primary">
-      <span>🚨 DEPLOYMENT TEST 🚨 - IF YOU SEE THIS, DEPLOYMENT WORKS!</span>
+      <span>Crypto Portfolio Analyzer</span>
       <span class="spacer"></span>
       <span class="version">v1.0.1</span>
     </mat-toolbar>
@@ -43,50 +43,35 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
         </mat-card-header>
       </mat-card>
 
-      <!-- DEBUG: Testing if mat-tab-group renders at all -->
-      <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
-        <strong>DEBUG: Before mat-tab-group</strong> - This should always be visible
-      </div>
-      
       <mat-tab-group>
-        <mat-tab label="TEST TAB 1">
-          <div style="background: lightgreen; padding: 20px; margin: 10px;">
-            <h3>TEST TAB 1 CONTENT</h3>
-            <p>If you see this, mat-tab-group is working!</p>
+        <mat-tab label="Portfolio Analysis">
+          <div class="tab-content">
+            <app-portfolio-entry 
+              [initialPortfolio]="initialPortfolio"
+              (portfolioSubmitted)="onPortfolioSubmitted($event)"
+              (portfolioChanged)="onPortfolioChanged($event)"
+              (generateUrl)="onGenerateUrlFromEntry($event)">
+            </app-portfolio-entry>
+
+            <div *ngIf="isCalculating" class="text-center mt-2">
+              <mat-spinner></mat-spinner>
+              <p>Calculating rebalancing recommendations...</p>
+            </div>
+
+            <app-rebalancing-results 
+              *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
+              [result]="rebalanceResult"
+              [portfolio]="currentPortfolio">
+            </app-rebalancing-results>
           </div>
         </mat-tab>
-        <mat-tab label="TEST TAB 2">
-          <div style="background: lightblue; padding: 20px; margin: 10px;">
-            <h3>TEST TAB 2 CONTENT</h3>
-            <p>Second tab test content</p>
+        
+        <mat-tab label="Historical Backtesting">
+          <div class="tab-content">
+            <app-backtesting></app-backtesting>
           </div>
         </mat-tab>
       </mat-tab-group>
-      
-      <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
-        <strong>DEBUG: After mat-tab-group</strong> - This should always be visible
-      </div>
-
-      <!-- ORIGINAL CONTENT TEMPORARILY HIDDEN -->
-      <div style="display: none;">
-        <app-portfolio-entry 
-          [initialPortfolio]="initialPortfolio"
-          (portfolioSubmitted)="onPortfolioSubmitted($event)"
-          (portfolioChanged)="onPortfolioChanged($event)"
-          (generateUrl)="onGenerateUrlFromEntry($event)">
-        </app-portfolio-entry>
-
-        <div *ngIf="isCalculating" class="text-center mt-2">
-          <mat-spinner></mat-spinner>
-          <p>Calculating rebalancing recommendations...</p>
-        </div>
-
-        <app-rebalancing-results 
-          *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
-          [result]="rebalanceResult"
-          [portfolio]="currentPortfolio">
-        </app-rebalancing-results>
-      </div>
     </div>
   `,
   styles: [`
@@ -130,10 +115,8 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('AppComponent: ngOnInit started');
     this.checkApiHealth();
     this.loadPortfolioFromUrl();
-    console.log('AppComponent: ngOnInit completed');
   }
 
   private checkApiHealth(): void {

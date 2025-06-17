@@ -1,8 +1,11 @@
 # CLAUDE.md - AI Agent Instructions
 
 ## 🎯 Project: Crypto Portfolio Analyzer
-**Status**: Phase 1 Complete, Phase 2 Deployment Issues | **Cost**: $0/month operational | **Architecture**: Client-side only  
-**Live**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net (Backtesting tab issue)
+**Status**: Phase 1 Complete, Auto-deployment Working | **Cost**: $0/month operational | **Architecture**: Client-side only  
+**Production**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net
+**Dev/Preview**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
+
+⚠️ **IMPORTANT**: Always test deployment changes on the **production** URL, not the preview URL!
 
 ## 🚀 Quick Start
 ```bash
