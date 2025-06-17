@@ -10,7 +10,35 @@ on:
       - main
 
 jobs:
+  # First run CI tests, then deploy only if tests pass
+  ci_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run frontend linting
+        run: |
+          cd frontend
+          npm run lint
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm run test:coverage:ci
+
   build_and_deploy_job:
+    needs: ci_tests  # Only run after CI tests pass
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
