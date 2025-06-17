@@ -28,7 +28,7 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
   ],
   template: `
     <mat-toolbar color="primary">
-      <span>Crypto Portfolio Analyzer</span>
+      <span>🚨 DEPLOYMENT TEST 🚨 - IF YOU SEE THIS, DEPLOYMENT WORKS!</span>
       <span class="spacer"></span>
       <span class="version">v1.0.1</span>
     </mat-toolbar>
