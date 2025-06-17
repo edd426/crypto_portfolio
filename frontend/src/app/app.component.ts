@@ -8,7 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 import { PortfolioEntryComponent } from './components/portfolio-entry/portfolio-entry.component';
 import { RebalancingResultsComponent } from './components/rebalancing-results/rebalancing-results.component';
-import { BacktestingComponent } from './components/backtesting/backtesting.component';
+// import { BacktestingComponent } from './components/backtesting/backtesting.component';
 import { Portfolio, RebalanceResult } from './models/portfolio.model';
 import { ApiService } from './services/api.service';
 import { PortfolioUrlService } from './services/portfolio-url.service';
@@ -23,8 +23,8 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
     MatProgressSpinnerModule,
     MatTabsModule,
     PortfolioEntryComponent,
-    RebalancingResultsComponent,
-    BacktestingComponent
+    RebalancingResultsComponent
+    // BacktestingComponent
   ],
   template: `
     <mat-toolbar color="primary">
@@ -66,6 +66,8 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
           </div>
         </mat-tab>
 
+        <!-- TEMPORARILY REMOVED: Historical Backtesting tab to test root cause -->
+        <!--
         <mat-tab label="Historical Backtesting">
           <div class="tab-content">
             <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc;">
@@ -74,6 +76,7 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
             <app-backtesting></app-backtesting>
           </div>
         </mat-tab>
+        -->
       </mat-tab-group>
     </div>
   `,

@@ -9,7 +9,7 @@ import { ApiService } from '../services/api.service';
 import { PortfolioUrlService } from '../services/portfolio-url.service';
 import { PortfolioEntryComponent } from '../components/portfolio-entry/portfolio-entry.component';
 import { RebalancingResultsComponent } from '../components/rebalancing-results/rebalancing-results.component';
-import { BacktestingComponent } from '../components/backtesting/backtesting.component';
+// import { BacktestingComponent } from '../components/backtesting/backtesting.component';
 import { Portfolio, RebalanceResult } from '../models/portfolio.model';
 
 describe('AppComponent', () => {
@@ -109,8 +109,8 @@ describe('AppComponent', () => {
         NoopAnimationsModule,
         HttpClientTestingModule,
         PortfolioEntryComponent,
-        RebalancingResultsComponent,
-        BacktestingComponent
+        RebalancingResultsComponent
+        // BacktestingComponent
       ],
       providers: [
         { provide: ApiService, useValue: apiServiceSpy },
