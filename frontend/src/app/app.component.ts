@@ -43,41 +43,50 @@ import { PortfolioUrlService } from './services/portfolio-url.service';
         </mat-card-header>
       </mat-card>
 
+      <!-- DEBUG: Testing if mat-tab-group renders at all -->
+      <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
+        <strong>DEBUG: Before mat-tab-group</strong> - This should always be visible
+      </div>
+      
       <mat-tab-group>
-        <mat-tab label="Portfolio Analysis">
-          <div class="tab-content">
-            <app-portfolio-entry 
-              [initialPortfolio]="initialPortfolio"
-              (portfolioSubmitted)="onPortfolioSubmitted($event)"
-              (portfolioChanged)="onPortfolioChanged($event)"
-              (generateUrl)="onGenerateUrlFromEntry($event)">
-            </app-portfolio-entry>
-
-            <div *ngIf="isCalculating" class="text-center mt-2">
-              <mat-spinner></mat-spinner>
-              <p>Calculating rebalancing recommendations...</p>
-            </div>
-
-            <app-rebalancing-results 
-              *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
-              [result]="rebalanceResult"
-              [portfolio]="currentPortfolio">
-            </app-rebalancing-results>
+        <mat-tab label="TEST TAB 1">
+          <div style="background: lightgreen; padding: 20px; margin: 10px;">
+            <h3>TEST TAB 1 CONTENT</h3>
+            <p>If you see this, mat-tab-group is working!</p>
           </div>
         </mat-tab>
-
-        <!-- TEMPORARILY REMOVED: Historical Backtesting tab to test root cause -->
-        <!--
-        <mat-tab label="Historical Backtesting">
-          <div class="tab-content">
-            <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc;">
-              <strong>DEBUG: Historical Backtesting Tab Loaded</strong> - If you see this, the tab is rendering
-            </div>
-            <app-backtesting></app-backtesting>
+        <mat-tab label="TEST TAB 2">
+          <div style="background: lightblue; padding: 20px; margin: 10px;">
+            <h3>TEST TAB 2 CONTENT</h3>
+            <p>Second tab test content</p>
           </div>
         </mat-tab>
-        -->
       </mat-tab-group>
+      
+      <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
+        <strong>DEBUG: After mat-tab-group</strong> - This should always be visible
+      </div>
+
+      <!-- ORIGINAL CONTENT TEMPORARILY HIDDEN -->
+      <div style="display: none;">
+        <app-portfolio-entry 
+          [initialPortfolio]="initialPortfolio"
+          (portfolioSubmitted)="onPortfolioSubmitted($event)"
+          (portfolioChanged)="onPortfolioChanged($event)"
+          (generateUrl)="onGenerateUrlFromEntry($event)">
+        </app-portfolio-entry>
+
+        <div *ngIf="isCalculating" class="text-center mt-2">
+          <mat-spinner></mat-spinner>
+          <p>Calculating rebalancing recommendations...</p>
+        </div>
+
+        <app-rebalancing-results 
+          *ngIf="rebalanceResult && !isCalculating && currentPortfolio"
+          [result]="rebalanceResult"
+          [portfolio]="currentPortfolio">
+        </app-rebalancing-results>
+      </div>
     </div>
   `,
   styles: [`
