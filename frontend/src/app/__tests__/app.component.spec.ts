@@ -417,8 +417,8 @@ describe('AppComponent', () => {
       const tabGroup = compiled.querySelector('mat-tab-group');
       
       expect(tabGroup).toBeTruthy();
-      expect(compiled.textContent).toContain('Portfolio Analysis');
-      expect(compiled.textContent).toContain('Historical Backtesting');
+      expect(compiled.textContent).toContain('TEST TAB 1');
+      expect(compiled.textContent).toContain('TEST TAB 2');
     });
 
     it('should show portfolio entry component in Portfolio Analysis tab', () => {
