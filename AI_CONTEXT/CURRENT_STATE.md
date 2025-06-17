@@ -21,21 +21,21 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 5. **Export functionality** (CSV, PDF reports)
 
 ## 📝 RECENT SESSION NOTES (June 17, 2025)
-- **MAJOR BREAKTHROUGH**: Fixed Azure deployment pipeline - automatic deployment now working!
-- **Deployment Issue Resolved**: Code changes now auto-deploy to production in ~2-3 minutes
-- **URL Discovery**: Found two separate URLs (production vs preview) - were testing wrong URL
-- **Infrastructure**: Added Azure Static Web Apps deployment workflow with proper CI/CD
-- **Current status**: Full auto-deployment working, proper production testing established
-- **Testing notes**: All tests pass (105/105), linting clean, coverage at 57.4%
+- **BACKTESTING IMPROVEMENTS**: Fixed 3 major issues with Historical Backtesting tab
+- **Issue 1 FIXED**: Settings form now stays visible after running backtest (like Portfolio Analysis tab)
+- **Issue 2 FIXED**: Added Portfolio Value Over Time chart to Performance subtab using Chart.js
+- **Issue 3 FIXED**: Updated calendar minimum date to Bitcoin launch (January 3, 2009)
+- **Bundle Size**: Updated Angular build budgets to accommodate Chart.js (1.23MB total)
+- **Testing notes**: All tests pass (105/105), linting clean, coverage at 56.55%
 
 ## 📁 FILES MODIFIED RECENTLY (June 17, 2025)
-- `AI_CONTEXT/AGENT_GUIDELINES.md` - NEW: AI agent behavioral guidelines with decision framework, pitfalls, recovery procedures
-- `.claude/templates/component.template.ts` - NEW: Smart component template following project patterns
-- `.claude/templates/service.template.ts` - NEW: Smart service template with caching and error handling
-- `.claude/templates/test.template.spec.ts` - NEW: Smart test template with comprehensive coverage patterns  
-- `.claude/templates/model.template.ts` - NEW: Smart model template with TypeScript types and validation
-- `.claude/templates/README.md` - NEW: Documentation for using smart templates
-- `CLAUDE.md` - UPDATED: Added reference to AGENT_GUIDELINES.md and templates directory
+- `frontend/src/app/components/backtesting/backtesting.component.ts` - UPDATED: Historical Backtesting improvements
+  - Added Portfolio Value Over Time chart with Chart.js integration
+  - Fixed settings form visibility (always visible after backtest)
+  - Set minimum date to Bitcoin launch (January 3, 2009)
+  - Enhanced UI with date hints and proper validation
+- `frontend/angular.json` - UPDATED: Build budgets increased to accommodate Chart.js
+- `frontend/package.json` - UPDATED: Added Chart.js dependency
 
 ## 🏗️ ARCHITECTURE
 - **Client-side only**: No backend deployment
@@ -73,11 +73,12 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 - **✅ READY**: Phase 2 infrastructure configured
 
 ## 🧪 TESTING STATUS
-- **Coverage**: 57.3% statements (target: 70%)
-- **Frontend Tests**: 105/105 passing (previously 74/105)
+- **Coverage**: 56.55% statements (target: 70%) - Down slightly due to new Chart.js code
+- **Frontend Tests**: 105/105 passing 
 - **Backend Tests**: REMOVED (architecture change)
 - **Framework**: Jest (modernized from mixed Jest/Jasmine)
 - **CI/CD**: GitHub Actions active
+- **Recent**: Fixed Angular Material datepicker binding issue for Bitcoin launch date
 
 ## 🚀 PHASE 2 STATUS
 - **Ready**: Infrastructure and foundation complete
@@ -90,45 +91,42 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 ## 🚀 HANDOFF NOTES (Updated: June 17, 2025)
 
 ### **What Was Just Completed**
-- **AI Agent Infrastructure**: Created comprehensive behavioral guidelines and decision framework for AI agents
-- **Smart File Templates**: Built template system for components, services, tests, and models with project patterns
-- **Context Management**: Added priority guide for efficient context loading and tool usage optimization
-- **Error Recovery System**: Implemented rollback procedures and recovery patterns for common AI mistakes
-- **Code Consistency**: Established templates that follow Angular 17+ standalone components and Material Design
-- **Documentation Structure**: Enhanced AI agent workflow with clear guidelines and best practices
+- **Historical Backtesting UI Improvements**: Fixed 3 major user-reported issues with the backtesting functionality
+- **Settings Persistence**: Form now stays visible after running backtest (matching Portfolio Analysis behavior)
+- **Performance Charts**: Added Portfolio Value Over Time chart using Chart.js library with proper formatting
+- **Date Validation**: Set minimum date to Bitcoin launch (January 3, 2009) with user-friendly hints
+- **Bundle Optimization**: Updated Angular build budgets to accommodate Chart.js without deployment failures
+- **Code Quality**: All tests passing (105/105), linting clean, production deployment successful
 
 ### **Immediate Priorities for Next Developer**
 
-#### 1. **Use AI Agent Guidelines for All Development** (Priority: HIGH)
-- **New Resource**: Read `AI_CONTEXT/AGENT_GUIDELINES.md` before starting any work
-- **Benefits**: Prevents common AI mistakes, provides context priority guide, includes error recovery procedures
-- **Files**: All development should follow the behavioral guidelines and use smart templates in `.claude/templates/`
-- **Impact**: Dramatically improved AI agent effectiveness and code consistency
+#### 1. **Implement Additional Chart Types** (Priority: MEDIUM)
+- **Next Step**: Add Cumulative Returns, Drawdown, and Asset Allocation charts to Performance tab
+- **Foundation**: Chart.js integration is complete, reuse patterns from Portfolio Value Over Time chart
+- **Files**: `frontend/src/app/components/backtesting/backtesting.component.ts:622-702` (createPerformanceChart method)
+- **User Request**: "I would personally like to see more graphs over time on this part of the application"
 
-#### 2. **RESOLVED: Historical Backtesting Tab Issue** (Status: FIXED)
-- **Root Cause**: Azure deployment pipeline was broken - code wasn't reaching production
-- **Solution**: Added Azure Static Web Apps deployment workflow with proper GitHub Actions integration
-- **Result**: Auto-deployment now working perfectly (2-3 minute deploy time)
-- **Discovery**: Two separate URLs (production vs preview) - issue was testing wrong URL
-- **Status**: Deployment infrastructure fixed, ready to restore proper application functionality
+#### 2. **Enhance Rebalancing Logic** (Priority: MEDIUM) 
+- **Issue**: Current algorithm doesn't handle cash-only periods before first crypto appears
+- **Requirements**: Cash should remain as cash until Bitcoin (2009), then 100% Bitcoin, then rebalance by market cap
+- **Data Constraint**: Historical data only covers 1 year (2024-2025), not full crypto history
+- **Files**: `frontend/src/app/services/backtesting.service.ts` (rebalancing logic)
 
 #### 3. **Improve Test Coverage to 70%** (Priority: HIGH)
-- **Current**: 57.4% statements, 39.37% branches (target: 70%)
+- **Current**: 56.55% statements, 39.15% branches (target: 70%)
 - **Focus Areas**: Backtesting Service (4.21% coverage), Historical Data Service (28.75% coverage)
 - **Files**: `frontend/src/app/services/backtesting.service.ts`, `frontend/src/app/services/historical-data.service.ts`
 - **Action**: Use `.claude/templates/test.template.spec.ts` as starting point for comprehensive test suites
-- **Impact**: Meet project test coverage requirements and improve code reliability
 
 ### **Known Issues**
-- **BLOCKING**: Historical Backtesting tab not visible in production despite successful builds
-- **Test Coverage Gap**: Need additional 12.6% coverage to reach 70% target  
-- **Bundle Size Warning**: 1.09 MB bundle (expected for Angular Material, not blocking)
-- **Production Status**: Portfolio Analysis works perfectly, Backtesting tab missing from UI
+- **Test Coverage Gap**: Need additional 13.45% coverage to reach 70% target (currently 56.55%)
+- **Bundle Size**: 1.23 MB (up from 1.09 MB due to Chart.js, within acceptable limits)
+- **Future Enhancement**: Rebalancing logic could be more sophisticated for long historical periods
+- **Data Limitation**: Historical data only covers 1 year, not full cryptocurrency history
 
 ### **Files to Focus On**
-- **START HERE**: `AI_CONTEXT/AGENT_GUIDELINES.md` (read behavioral guidelines first)
-- **Templates**: `.claude/templates/` (use for new components, services, tests)
-- **URGENT**: `frontend/src/app/components/backtesting/backtesting.component.ts` (fix runtime loading issue)
-- **Primary**: `frontend/src/app/app.component.ts` (investigate tab group rendering)
-- **Secondary**: `frontend/src/app/services/backtesting.service.ts` (add tests once tab is visible)
-- **Reference**: Browser developer console in production for component loading errors
+- **NEXT CHARTS**: `frontend/src/app/components/backtesting/backtesting.component.ts:622-702` (add more chart types)
+- **REBALANCING**: `frontend/src/app/services/backtesting.service.ts` (enhance algorithm logic)
+- **TEST COVERAGE**: `frontend/src/app/services/backtesting.service.ts` (4.21% coverage - add comprehensive tests)
+- **TEST COVERAGE**: `frontend/src/app/services/historical-data.service.ts` (28.75% coverage - add service tests)
+- **REFERENCE**: Chart.js integration pattern already established in createPerformanceChart method

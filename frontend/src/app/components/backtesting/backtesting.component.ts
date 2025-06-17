@@ -55,12 +55,13 @@ Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryS
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Start Date</mat-label>
-              <input matInput [matDatepicker]="startPicker" formControlName="startDate" readonly>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" readonly [min]="bitcoinLaunchDate">
               <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
               <mat-datepicker #startPicker></mat-datepicker>
               <mat-error *ngIf="configForm.get('startDate')?.errors?.['required']">
                 Start date is required
               </mat-error>
+              <mat-hint>Earliest date: January 3, 2009 (Bitcoin launch)</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -405,6 +406,9 @@ export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
   portfolioColumns = ['date', 'totalValue', 'topHoldings'];
   rebalanceColumns = ['date', 'beforeValue', 'afterValue', 'fees', 'trades'];
 
+  // Bitcoin launch date for date picker minimum
+  readonly bitcoinLaunchDate = new Date('2009-01-03');
+
   private performanceChart: Chart | null = null;
   private destroy$ = new Subject<void>();
 
@@ -425,11 +429,16 @@ export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
     try {
       // Set default dates first (most critical)
       const endDate = new Date();
+      // Bitcoin launch date: January 3, 2009
+      const bitcoinLaunchDate = new Date('2009-01-03');
       const startDate = new Date();
       startDate.setFullYear(startDate.getFullYear() - 2); // Default to 2 years
       
+      // Use Bitcoin launch date if default start date is earlier
+      const finalStartDate = startDate < bitcoinLaunchDate ? bitcoinLaunchDate : startDate;
+      
       this.configForm.patchValue({
-        startDate,
+        startDate: finalStartDate,
         endDate
       });
 

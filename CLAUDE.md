@@ -1,7 +1,7 @@
 # CLAUDE.md - AI Agent Instructions
 
 ## 🎯 Project: Crypto Portfolio Analyzer
-**Status**: Phase 1 Complete, Auto-deployment Working | **Cost**: $0/month operational | **Architecture**: Client-side only  
+**Status**: Phase 1 Complete, Historical Backtesting Enhanced | **Cost**: $0/month operational | **Architecture**: Client-side only  
 **Production**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net
 **Dev/Preview**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
 
@@ -17,6 +17,7 @@ npm run lint                   # Code quality check
 ## 📁 Key Files
 - **Portfolio Logic**: `frontend/src/app/services/api.service.ts`
 - **Rebalancing**: `frontend/src/app/components/rebalancing-results/`
+- **Historical Backtesting**: `frontend/src/app/components/backtesting/`
 - **Portfolio Entry**: `frontend/src/app/components/portfolio-entry/`
 - **Types**: `frontend/src/app/models/portfolio.model.ts`
 - **Tests**: `frontend/src/app/__tests__/`, `frontend/src/app/*//__tests__/`
@@ -36,5 +37,6 @@ npm run lint                   # Code quality check
 - **API**: Direct CoinGecko integration (free tier, rate limited)
 - **Hosting**: Azure Static Web App
 - **Data**: Azure Blob Storage (97 cryptocurrencies, 1 year historical data)
-- **Testing**: Jest (105/105 tests passing, 57.4% coverage)
+- **Charts**: Chart.js integration for performance visualization
+- **Testing**: Jest (105/105 tests passing, 56.6% coverage)
 
