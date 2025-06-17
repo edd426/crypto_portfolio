@@ -46,8 +46,8 @@ import { BacktestingErrorHandler, BacktestingError } from '../../utils/error-han
       </mat-card-header>
 
       <mat-card-content>
-        <!-- Configuration Form -->
-        <form [formGroup]="configForm" *ngIf="!isRunning && !result">
+        <!-- Configuration Form - Always Visible -->
+        <form [formGroup]="configForm">
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Start Date</mat-label>
@@ -159,10 +159,6 @@ import { BacktestingErrorHandler, BacktestingError } from '../../utils/error-han
         <div *ngIf="result" class="results-container">
           <div class="results-header">
             <h3>Backtest Results</h3>
-            <button mat-stroked-button (click)="startNewBacktest()">
-              <mat-icon>refresh</mat-icon>
-              New Backtest
-            </button>
           </div>
 
           <mat-tab-group>
@@ -262,10 +258,14 @@ import { BacktestingErrorHandler, BacktestingError } from '../../utils/error-han
         </div>
       </mat-card-content>
 
-      <mat-card-actions *ngIf="!isRunning && !result">
-        <button mat-raised-button color="primary" (click)="runBacktest()" [disabled]="!configForm.valid">
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="runBacktest()" [disabled]="!configForm.valid || isRunning">
           <mat-icon>analytics</mat-icon>
-          Run Backtest
+          {{ result ? 'Run New Backtest' : 'Run Backtest' }}
+        </button>
+        <button mat-stroked-button *ngIf="result" (click)="startNewBacktest()">
+          <mat-icon>refresh</mat-icon>
+          Clear Results
         </button>
       </mat-card-actions>
     </mat-card>
