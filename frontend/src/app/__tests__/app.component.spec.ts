@@ -399,7 +399,7 @@ describe('AppComponent', () => {
       const toolbar = compiled.querySelector('mat-toolbar');
       
       expect(toolbar).toBeTruthy();
-      expect(toolbar.textContent).toContain('Crypto Portfolio Analyzer');
+      expect(toolbar.textContent).toContain('🚨 DEPLOYMENT TEST 🚨');
       expect(toolbar.textContent).toMatch(/v\d+\.\d+\.\d+/);
     });
 
