@@ -17,22 +17,21 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 4. **Advanced metrics** (rolling Sharpe, correlation analysis)
 5. **Export functionality** (CSV, PDF reports)
 
-## 📝 RECENT SESSION NOTES (June 16, 2025)
-- **What was completed**: Critical deployment fixes, production stability improvements, CI/CD pipeline repair
-- **Major issues resolved**: Corrupted HTML deployment causing website hangs, CI test failures, production console errors
-- **Current status**: Website loads correctly with JavaScript, GitHub Actions passing, production deployment stable
+## 📝 RECENT SESSION NOTES (June 17, 2025)
+- **What was completed**: AI agent management infrastructure improvements, behavioral guidelines, smart templates
+- **Major additions**: AI_CONTEXT/AGENT_GUIDELINES.md for behavioral rules, .claude/templates/ for code consistency
+- **Current status**: Enhanced AI agent workflow with context priority guide, error recovery procedures, file templates
 - **Known issues**: Historical Backtesting tab not visible in production (renders in build but missing from UI)
 - **Testing notes**: All tests pass (105/105), linting clean, coverage at 57.4%
 
-## 📁 FILES MODIFIED RECENTLY (June 16, 2025)
-- `frontend/src/app/app.component.ts` - UPDATED: Version bump to v1.0.1, deployment fixes
-- `frontend/src/app/__tests__/app.component.spec.ts` - UPDATED: Pattern-based version testing for maintainability
-- `frontend/src/app/components/backtesting/backtesting.component.ts` - UPDATED: Added defensive error handling for initialization
-- `frontend/src/app/services/api.service.ts` - UPDATED: Removed console statements causing production hangs
-- `frontend/src/app/services/backtesting.service.ts` - UPDATED: Removed debug console statements
-- `frontend/src/app/components/rebalancing-results/rebalancing-results.component.ts` - UPDATED: Removed debug console statements
-- `.github/workflows/ci.yml` - UPDATED: Fixed CI pipeline for frontend-only architecture
-- `frontend/package.json` - UPDATED: Added test:coverage:ci script, increased bundle budget
+## 📁 FILES MODIFIED RECENTLY (June 17, 2025)
+- `AI_CONTEXT/AGENT_GUIDELINES.md` - NEW: AI agent behavioral guidelines with decision framework, pitfalls, recovery procedures
+- `.claude/templates/component.template.ts` - NEW: Smart component template following project patterns
+- `.claude/templates/service.template.ts` - NEW: Smart service template with caching and error handling
+- `.claude/templates/test.template.spec.ts` - NEW: Smart test template with comprehensive coverage patterns  
+- `.claude/templates/model.template.ts` - NEW: Smart model template with TypeScript types and validation
+- `.claude/templates/README.md` - NEW: Documentation for using smart templates
+- `CLAUDE.md` - UPDATED: Added reference to AGENT_GUIDELINES.md and templates directory
 
 ## 🏗️ ARCHITECTURE
 - **Client-side only**: No backend deployment
@@ -84,36 +83,37 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 
 ---
 
-## 🚀 HANDOFF NOTES (Updated: June 16, 2025)
+## 🚀 HANDOFF NOTES (Updated: June 17, 2025)
 
 ### **What Was Just Completed**
-- **Critical Production Fixes**: Resolved corrupted HTML deployment causing website hangs and JavaScript load failures
-- **CI/CD Pipeline Repair**: Fixed GitHub Actions failures, all tests now passing (105/105)
-- **Console Statement Cleanup**: Removed production-breaking console.log statements from core services
-- **Deployment Stability**: Achieved stable production deployment with proper JavaScript loading
-- **Error Handling Enhancement**: Added defensive initialization error handling to BacktestingComponent
-- **Test Maintainability**: Converted hardcoded version tests to pattern-based regex for future-proofing
+- **AI Agent Infrastructure**: Created comprehensive behavioral guidelines and decision framework for AI agents
+- **Smart File Templates**: Built template system for components, services, tests, and models with project patterns
+- **Context Management**: Added priority guide for efficient context loading and tool usage optimization
+- **Error Recovery System**: Implemented rollback procedures and recovery patterns for common AI mistakes
+- **Code Consistency**: Established templates that follow Angular 17+ standalone components and Material Design
+- **Documentation Structure**: Enhanced AI agent workflow with clear guidelines and best practices
 
 ### **Immediate Priorities for Next Developer**
 
-#### 1. **CRITICAL: Fix Historical Backtesting Tab Visibility** (Priority: URGENT)
+#### 1. **Use AI Agent Guidelines for All Development** (Priority: HIGH)
+- **New Resource**: Read `AI_CONTEXT/AGENT_GUIDELINES.md` before starting any work
+- **Benefits**: Prevents common AI mistakes, provides context priority guide, includes error recovery procedures
+- **Files**: All development should follow the behavioral guidelines and use smart templates in `.claude/templates/`
+- **Impact**: Dramatically improved AI agent effectiveness and code consistency
+
+#### 2. **CRITICAL: Fix Historical Backtesting Tab Visibility** (Priority: URGENT)
 - **Issue**: Tab exists in template and builds successfully but doesn't render in production UI
 - **Investigation**: BacktestingComponent may be failing silently during runtime initialization
 - **Files**: `frontend/src/app/components/backtesting/backtesting.component.ts`, `frontend/src/app/app.component.ts`
 - **Action**: Debug runtime component loading, check browser console for errors, verify Material Design tab rendering
 - **Impact**: Core feature completely inaccessible to users despite infrastructure being ready
 
-#### 2. **Improve Test Coverage to 70%** (Priority: HIGH)
+#### 3. **Improve Test Coverage to 70%** (Priority: HIGH)
 - **Current**: 57.4% statements, 39.37% branches (target: 70%)
 - **Focus Areas**: Backtesting Service (4.21% coverage), Historical Data Service (28.75% coverage)
 - **Files**: `frontend/src/app/services/backtesting.service.ts`, `frontend/src/app/services/historical-data.service.ts`
-- **Action**: Add comprehensive test suites for remaining uncovered services
+- **Action**: Use `.claude/templates/test.template.spec.ts` as starting point for comprehensive test suites
 - **Impact**: Meet project test coverage requirements and improve code reliability
-
-#### 3. **Phase 2 Backtesting Enhancement** (Priority: MEDIUM)  
-- **Current**: Component exists with error handling but tab not visible to users
-- **Action**: Once tab visibility is fixed, expand beyond current limitations to use all available historical data
-- **Impact**: Unlock full potential of existing data infrastructure
 
 ### **Known Issues**
 - **BLOCKING**: Historical Backtesting tab not visible in production despite successful builds
@@ -122,6 +122,8 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 - **Production Status**: Portfolio Analysis works perfectly, Backtesting tab missing from UI
 
 ### **Files to Focus On**
+- **START HERE**: `AI_CONTEXT/AGENT_GUIDELINES.md` (read behavioral guidelines first)
+- **Templates**: `.claude/templates/` (use for new components, services, tests)
 - **URGENT**: `frontend/src/app/components/backtesting/backtesting.component.ts` (fix runtime loading issue)
 - **Primary**: `frontend/src/app/app.component.ts` (investigate tab group rendering)
 - **Secondary**: `frontend/src/app/services/backtesting.service.ts` (add tests once tab is visible)

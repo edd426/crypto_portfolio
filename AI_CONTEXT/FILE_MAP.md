@@ -3,6 +3,11 @@
 
 ## 🎯 Feature → File Mapping
 
+### AI Agent Infrastructure
+- **Behavioral Guidelines**: `AI_CONTEXT/AGENT_GUIDELINES.md`
+- **Smart Templates**: `.claude/templates/` (component, service, test, model templates)
+- **Template Documentation**: `.claude/templates/README.md`
+
 ### Portfolio Entry & Forms
 - **Main Component**: `frontend/src/app/components/portfolio-entry/portfolio-entry.component.ts`
 - **Template**: `frontend/src/app/components/portfolio-entry/portfolio-entry.component.html`

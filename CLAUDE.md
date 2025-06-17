@@ -19,11 +19,13 @@ npm run lint                   # Code quality check
 - **Tests**: `frontend/src/app/__tests__/`, `frontend/src/app/*//__tests__/`
 
 ## 🔗 Detailed Context
+- `AI_CONTEXT/AGENT_GUIDELINES.md` - **START HERE** - AI agent behavioral rules & best practices
 - `AI_CONTEXT/CURRENT_STATE.md` - Current deployment status & next priorities
 - `AI_CONTEXT/CODE_PATTERNS.md` - How to implement features correctly
 - `AI_CONTEXT/FILE_MAP.md` - Where to find and modify specific features
 - `AI_CONTEXT/CONSTRAINTS.md` - Hard rules and limitations (critical reading)
 - `AI_CONTEXT/AI_TASKS.md` - Step-by-step templates for common tasks
+- `.claude/templates/` - Smart file templates for new components/services/tests
 
 ## 🏗️ Tech Stack
 - **Frontend**: Angular 17+ with standalone components, TypeScript strict mode
