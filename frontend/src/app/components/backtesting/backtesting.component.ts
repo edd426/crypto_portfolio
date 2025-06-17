@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -14,10 +14,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Subject, takeUntil } from 'rxjs';
+import { Chart, ChartConfiguration, ChartData, LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend } from 'chart.js';
 
 import { BacktestingService, BacktestConfig, BacktestResult } from '../../services/backtesting.service';
 import { HistoricalDataService } from '../../services/historical-data.service';
 import { BacktestingErrorHandler, BacktestingError } from '../../utils/error-handler.util';
+
+// Register Chart.js components
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend);
 
 @Component({
   selector: 'app-backtesting',
@@ -386,7 +390,9 @@ import { BacktestingErrorHandler, BacktestingError } from '../../utils/error-han
     }
   `]
 })
-export class BacktestingComponent implements OnInit, OnDestroy {
+export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('performanceChart') performanceChartRef!: ElementRef<HTMLCanvasElement>;
+
   configForm: FormGroup;
   isRunning = false;
   result: BacktestResult | null = null;
@@ -399,6 +405,7 @@ export class BacktestingComponent implements OnInit, OnDestroy {
   portfolioColumns = ['date', 'totalValue', 'topHoldings'];
   rebalanceColumns = ['date', 'beforeValue', 'afterValue', 'fees', 'trades'];
 
+  private performanceChart: Chart | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -455,8 +462,15 @@ export class BacktestingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.performanceChart) {
+      this.performanceChart.destroy();
+    }
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngAfterViewInit(): void {
+    // Chart will be created when results are available
   }
 
   private createForm(): FormGroup {
@@ -573,6 +587,9 @@ export class BacktestingComponent implements OnInit, OnDestroy {
       .slice(-50); // Last 50 entries
 
     this.rebalanceTableData = this.result.rebalanceEvents;
+    
+    // Create performance chart
+    this.createPerformanceChart();
   }
 
   // Formatting helper methods
@@ -600,5 +617,87 @@ export class BacktestingComponent implements OnInit, OnDestroy {
       .map(([symbol, data]: [string, any]) => `${symbol} (${data.percentage.toFixed(1)}%)`);
     
     return sorted.join(', ');
+  }
+
+  private createPerformanceChart(): void {
+    if (!this.result || !this.performanceChartRef) return;
+
+    // Destroy existing chart if it exists
+    if (this.performanceChart) {
+      this.performanceChart.destroy();
+    }
+
+    const ctx = this.performanceChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    // Prepare chart data from portfolio history
+    const labels = this.result.portfolioHistory.map(entry => entry.date);
+    const dataValues = this.result.portfolioHistory.map(entry => entry.totalValue);
+
+    const chartConfig: ChartConfiguration<'line'> = {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Portfolio Value',
+          data: dataValues,
+          borderColor: '#1976d2',
+          backgroundColor: 'rgba(25, 118, 210, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: 'category',
+            title: {
+              display: true,
+              text: 'Date'
+            }
+          },
+          y: {
+            type: 'linear',
+            title: {
+              display: true,
+              text: 'Portfolio Value (USD)'
+            },
+            ticks: {
+              callback: function(value) {
+                return new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(value as number);
+              }
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Portfolio Value Over Time'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `Portfolio Value: ${new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(context.parsed.y)}`;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    this.performanceChart = new Chart(ctx, chartConfig);
   }
 }
