@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -166,7 +166,7 @@ Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryS
             <h3>Backtest Results</h3>
           </div>
 
-          <mat-tab-group>
+          <mat-tab-group (selectedTabChange)="onTabChange($event)">
             <!-- Summary Tab -->
             <mat-tab label="Summary">
               <div class="metrics-grid">
@@ -586,6 +586,16 @@ export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  onTabChange(event: MatTabChangeEvent): void {
+    // Performance tab is index 1
+    if (event.index === 1 && this.result && !this.performanceChart) {
+      // Small delay to ensure tab content is rendered
+      setTimeout(() => {
+        this.createPerformanceChart();
+      }, 50);
+    }
+  }
+
   private prepareTableData(): void {
     if (!this.result) return;
 
@@ -597,8 +607,10 @@ export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.rebalanceTableData = this.result.rebalanceEvents;
     
-    // Create performance chart
-    this.createPerformanceChart();
+    // Create performance chart with delay to ensure DOM is ready
+    setTimeout(() => {
+      this.createPerformanceChart();
+    }, 100);
   }
 
   // Formatting helper methods
@@ -629,84 +641,106 @@ export class BacktestingComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private createPerformanceChart(): void {
-    if (!this.result || !this.performanceChartRef) return;
+    try {
+      console.log('Creating performance chart...');
+      
+      if (!this.result) {
+        console.warn('Cannot create chart: No backtest result available');
+        return;
+      }
+      
+      if (!this.performanceChartRef) {
+        console.warn('Cannot create chart: Canvas reference not available');
+        return;
+      }
 
-    // Destroy existing chart if it exists
-    if (this.performanceChart) {
-      this.performanceChart.destroy();
-    }
+      // Destroy existing chart if it exists
+      if (this.performanceChart) {
+        this.performanceChart.destroy();
+        this.performanceChart = null;
+      }
 
-    const ctx = this.performanceChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
+      const ctx = this.performanceChartRef.nativeElement.getContext('2d');
+      if (!ctx) {
+        console.error('Cannot create chart: Failed to get 2D context');
+        return;
+      }
 
-    // Prepare chart data from portfolio history
-    const labels = this.result.portfolioHistory.map(entry => entry.date);
-    const dataValues = this.result.portfolioHistory.map(entry => entry.totalValue);
+      // Prepare chart data from portfolio history
+      const labels = this.result.portfolioHistory.map(entry => entry.date);
+      const dataValues = this.result.portfolioHistory.map(entry => entry.totalValue);
 
-    const chartConfig: ChartConfiguration<'line'> = {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Portfolio Value',
-          data: dataValues,
-          borderColor: '#1976d2',
-          backgroundColor: 'rgba(25, 118, 210, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            type: 'category',
-            title: {
-              display: true,
-              text: 'Date'
-            }
-          },
-          y: {
-            type: 'linear',
-            title: {
-              display: true,
-              text: 'Portfolio Value (USD)'
+      console.log(`Chart data prepared: ${labels.length} data points`);
+
+      const chartConfig: ChartConfiguration<'line'> = {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Portfolio Value',
+            data: dataValues,
+            borderColor: '#1976d2',
+            backgroundColor: 'rgba(25, 118, 210, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: 'category',
+              title: {
+                display: true,
+                text: 'Date'
+              }
             },
-            ticks: {
-              callback: function(value) {
-                return new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(value as number);
+            y: {
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Portfolio Value (USD)'
+              },
+              ticks: {
+                callback: function(value) {
+                  return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(value as number);
+                }
               }
             }
-          }
-        },
-        plugins: {
-          title: {
-            display: true,
-            text: 'Portfolio Value Over Time'
           },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return `Portfolio Value: ${new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(context.parsed.y)}`;
+          plugins: {
+            title: {
+              display: true,
+              text: 'Portfolio Value Over Time'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Portfolio Value: ${new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(context.parsed.y)}`;
+                }
               }
             }
           }
         }
-      }
-    };
+      };
 
-    this.performanceChart = new Chart(ctx, chartConfig);
+      this.performanceChart = new Chart(ctx, chartConfig);
+      console.log('Performance chart created successfully');
+      
+    } catch (error) {
+      console.error('Failed to create performance chart:', error);
+    }
   }
 }
