@@ -167,6 +167,17 @@ backend/src/
 - **Main Config**: `infrastructure/environments/production-simple/main.tf`
 - **Deployment Guide**: `docs/DEPLOYMENT_INFRASTRUCTURE.md`
 
+### Historical Data Scripts
+- **Consolidated Downloader**: `functions/historical-data-updater/scripts/download.js` ⭐ Main script
+- **Enhanced Progress Checker**: `functions/historical-data-updater/scripts/check-progress-enhanced.js` (NEW: detailed analysis)
+- **Basic Progress Checker**: `functions/historical-data-updater/scripts/check-progress.js`
+- **API Debugging**: `functions/historical-data-updater/scripts/debug-api.js`
+- **Detailed Analysis**: `functions/historical-data-updater/scripts/detailed-analysis.js`
+- **Alternative Debug**: `functions/historical-data-updater/scripts/debug-alternative.js`
+- **Exact List**: `functions/historical-data-updater/scripts/get-exact-list.js`
+- **Blob Upload Test**: `functions/historical-data-updater/scripts/test-blob-upload.js`
+- **Documentation**: `functions/historical-data-updater/scripts/README.md` (comprehensive guide)
+
 ### CI/CD
 - **GitHub Actions**: `.github/workflows/ci.yml`
 - **Build Scripts**: `frontend/package.json` scripts section

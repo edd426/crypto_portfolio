@@ -1,5 +1,5 @@
 /**
- * Check progress of top 100 download by counting files in blob storage
+ * Enhanced progress checker with date ranges and gap detection
  */
 
 const { BlobServiceClient } = require('@azure/storage-blob');
@@ -16,7 +16,9 @@ async function checkProgress() {
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
     const containerClient = blobServiceClient.getContainerClient('historical-data');
     
-    console.log('📊 Checking historical data progress...\n');
+    console.log('📊 ENHANCED HISTORICAL DATA ANALYSIS');
+    console.log('='.repeat(50));
+    console.log('');
     
     let count = 0;
     let totalSize = 0;

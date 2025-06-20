@@ -38,6 +38,9 @@
 
 ### CoinGecko API Rules
 - **Free tier only** - no paid plans
+- **MAJOR LIMITATION**: Historical data limited to recent 1 year only (discovered June 20, 2025)
+- **No access** to data from 2009-2015 (Bitcoin early days, Ethereum launch, etc.)
+- **Cannot request** specific historical date ranges (2010, 2020, etc.)
 - Respect rate limits (50 calls/minute)
 - Use 5-minute caching minimum
 - Handle 429 errors gracefully

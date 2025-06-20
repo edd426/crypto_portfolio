@@ -34,9 +34,9 @@ npm run lint                   # Code quality check
 ## 🏗️ Tech Stack
 - **Frontend**: Angular 17+ with standalone components, TypeScript strict mode
 - **UI**: Angular Material design system
-- **API**: Direct CoinGecko integration (free tier, rate limited)
-- **Hosting**: Azure Static Web App
-- **Data**: Azure Blob Storage (97 cryptocurrencies, 1 year historical data)
+- **API**: Direct CoinGecko integration (free tier, **MAJOR LIMITATION**: recent 1 year only)
+- **Hosting**: Azure Static Web App  
+- **Data**: Azure Blob Storage (97 cryptocurrencies, **RECENT 1 YEAR ONLY** - no historical data from 2009-2015)
 - **Charts**: Chart.js integration for performance visualization
 - **Testing**: Jest (105/105 tests passing, 56.6% coverage)
 

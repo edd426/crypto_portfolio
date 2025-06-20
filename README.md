@@ -24,17 +24,18 @@ cd crypto_portfolio
 - 🔗 **URL Persistence** - Shareable portfolio links
 - ⚡ **Real-time Data** - Direct CoinGecko API integration with caching
 
-### Phase 2 (Ready for Implementation)
-- 📈 **Historical Backtesting** - 5-year performance analysis
+### Phase 2 (Data Source Migration Required)
+- 📈 **Historical Backtesting** - Full crypto history analysis (requires alternative data sources)
 - 📊 **Performance Metrics** - Sharpe ratio, max drawdown, returns
 - 🔄 **Rebalancing Frequencies** - Monthly/quarterly/yearly options
+- 🚨 **Note**: CoinGecko free API limited to recent 1 year data only
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Angular 17+ with TypeScript, Material Design
-- **API**: Direct CoinGecko integration (no backend required)
+- **API**: Direct CoinGecko integration (no backend required) ⚠️ *Free tier limitations apply*
 - **Hosting**: Azure Static Web App ($0/month operational cost)
-- **Testing**: Jest with 105/105 tests passing (57.3% coverage)
+- **Testing**: Jest with 105/105 tests passing (55.65% coverage)
 - **CI/CD**: GitHub Actions
 
 ## 📋 For Developers

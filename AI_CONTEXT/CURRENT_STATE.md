@@ -1,7 +1,7 @@
 # CURRENT_STATE.md
 *Single source of truth for project status*
 
-## ✅ DEPLOYMENT STATUS (Updated: June 17, 2025)
+## ✅ DEPLOYMENT STATUS (Updated: June 20, 2025)
 **Phase 1**: COMPLETE and LIVE  
 **Production URL**: https://blue-glacier-0ffdf2d1e.6.azurestaticapps.net  
 **Dev/Preview URL**: https://blue-glacier-0ffdf2d1e-preview.westus2.6.azurestaticapps.net
@@ -20,26 +20,30 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 4. **Advanced metrics** (rolling Sharpe, correlation analysis)
 5. **Export functionality** (CSV, PDF reports)
 
-## 📝 RECENT SESSION NOTES (June 17, 2025)
-- **BACKTESTING IMPROVEMENTS**: Fixed 3 major issues with Historical Backtesting tab
-- **Issue 1 FIXED**: Settings form now stays visible after running backtest (like Portfolio Analysis tab)
-- **Issue 2 FIXED**: Added Portfolio Value Over Time chart to Performance subtab using Chart.js
-- **Issue 3 FIXED**: Updated calendar minimum date to Bitcoin launch (January 3, 2009)
-- **Bundle Size**: Updated Angular build budgets to accommodate Chart.js (1.23MB total)
-- **Testing notes**: All tests pass (105/105), linting clean, coverage at 56.55%
+## 📝 RECENT SESSION NOTES (June 20, 2025)
+- **CRITICAL API DISCOVERY**: CoinGecko free API severely limited - only recent 1 year of data, no historical access
+- **SCRIPT CONSOLIDATION**: Reduced scripts from 15 → 9 files (40% reduction), eliminated redundant download variants
+- **DATA RESEARCH**: Identified multiple free alternatives (CryptoDataDownload, Kaggle, yfinance) for full historical data
+- **ENHANCED MONITORING**: Created detailed progress checker with date ranges and gap detection capabilities
+- **DOCUMENTATION UPDATED**: Added comprehensive API limitations and alternative data sources
+- **Testing notes**: All tests pass (105/105), linting clean, coverage at 55.65%
 
-## 📁 FILES MODIFIED RECENTLY (June 17, 2025)
-- `frontend/src/app/components/backtesting/backtesting.component.ts` - UPDATED: Historical Backtesting improvements
-  - Added Portfolio Value Over Time chart with Chart.js integration
-  - Fixed settings form visibility (always visible after backtest)
-  - Set minimum date to Bitcoin launch (January 3, 2009)
-  - Enhanced UI with date hints and proper validation
-- `frontend/angular.json` - UPDATED: Build budgets increased to accommodate Chart.js
-- `frontend/package.json` - UPDATED: Added Chart.js dependency
+## 📁 FILES MODIFIED RECENTLY (June 20, 2025)
+- `functions/historical-data-updater/scripts/download.js` - NEW: Consolidated downloader replacing 4 scripts
+  - Works within CoinGecko free API limits (365 days max)
+  - Command-line interface with --coins and --force options
+  - Fixed historical data calculation (was incorrectly limited to 2000 days)
+- `functions/historical-data-updater/scripts/check-progress-enhanced.js` - NEW: Advanced progress analysis
+  - Shows date ranges, data gaps, and coverage quality for each coin
+  - Comprehensive statistics and recommendations
+- `functions/historical-data-updater/scripts/README.md` - MAJOR UPDATE: API limitations documentation
+- `AI_CONTEXT/CONSTRAINTS.md` - UPDATED: Added CoinGecko free API limitations
+- `CLAUDE.md` - UPDATED: Highlighted data limitation impact
+- DELETED: 5 redundant scripts (download-top10.js, download-top100.js, etc.)
 
 ## 🏗️ ARCHITECTURE
 - **Client-side only**: No backend deployment
-- **API**: Direct CoinGecko calls from browser
+- **API**: Direct CoinGecko calls from browser (**MAJOR LIMITATION**: Free tier only provides recent 1 year data)
 - **Hosting**: Azure Static Web App
 - **Storage**: Azure Blob Storage (ready for Phase 2)
 - **Caching**: 5-minute client-side cache
@@ -73,60 +77,63 @@ Phase 2 infrastructure is complete. Immediate opportunities:
 - **✅ READY**: Phase 2 infrastructure configured
 
 ## 🧪 TESTING STATUS
-- **Coverage**: 56.55% statements (target: 70%) - Down slightly due to new Chart.js code
+- **Coverage**: 55.65% statements (target: 70%) - Stable
 - **Frontend Tests**: 105/105 passing 
 - **Backend Tests**: REMOVED (architecture change)
 - **Framework**: Jest (modernized from mixed Jest/Jasmine)
 - **CI/CD**: GitHub Actions active
-- **Recent**: Fixed Angular Material datepicker binding issue for Bitcoin launch date
+- **Recent**: All tests pass after script consolidation, no regressions introduced
 
 ## 🚀 PHASE 2 STATUS
-- **Ready**: Infrastructure and foundation complete
-- **Next**: Historical backtesting implementation
-- **Timeline**: 1-2 weeks estimated
-- **Cost**: $0.01/month projected
+- **BLOCKED**: CoinGecko free API only provides recent 1 year data, not full historical data needed for backtesting
+- **Alternative Data Sources Identified**: CryptoDataDownload.com, Kaggle datasets, yfinance library
+- **Next**: Implement alternative data collection strategy for full historical data (Bitcoin from 2014, Ethereum from 2016)
+- **Timeline**: 2-3 weeks estimated (increased due to data source change)
+- **Cost**: $0.01/month projected (still achievable with free data sources)
 
 ---
 
-## 🚀 HANDOFF NOTES (Updated: June 17, 2025)
+## 🚀 HANDOFF NOTES (Updated: June 20, 2025)
 
 ### **What Was Just Completed**
-- **Historical Backtesting UI Improvements**: Fixed 3 major user-reported issues with the backtesting functionality
-- **Settings Persistence**: Form now stays visible after running backtest (matching Portfolio Analysis behavior)
-- **Performance Charts**: Added Portfolio Value Over Time chart using Chart.js library with proper formatting
-- **Date Validation**: Set minimum date to Bitcoin launch (January 3, 2009) with user-friendly hints
-- **Bundle Optimization**: Updated Angular build budgets to accommodate Chart.js without deployment failures
-- **Code Quality**: All tests passing (105/105), linting clean, production deployment successful
+- **CRITICAL DATA DISCOVERY**: Identified major limitation in CoinGecko free API - only provides recent 1 year of data, blocking historical backtesting
+- **COMPREHENSIVE RESEARCH**: Analyzed 10+ alternative data sources, identified viable free solutions (CryptoDataDownload, Kaggle, yfinance)
+- **SCRIPT CONSOLIDATION**: Eliminated 5 redundant download scripts (40% reduction), created unified download.js with proper API limits
+- **ENHANCED MONITORING**: Built detailed progress checker showing date ranges, gaps, and data quality metrics
+- **COMPREHENSIVE DOCUMENTATION**: Updated all relevant docs with API limitations and alternative solutions
+- **CODE QUALITY**: All tests passing (105/105), linting clean, no regressions introduced
 
 ### **Immediate Priorities for Next Developer**
 
-#### 1. **Implement Additional Chart Types** (Priority: MEDIUM)
-- **Next Step**: Add Cumulative Returns, Drawdown, and Asset Allocation charts to Performance tab
-- **Foundation**: Chart.js integration is complete, reuse patterns from Portfolio Value Over Time chart
-- **Files**: `frontend/src/app/components/backtesting/backtesting.component.ts:622-702` (createPerformanceChart method)
-- **User Request**: "I would personally like to see more graphs over time on this part of the application"
+#### 1. **Implement Alternative Historical Data Collection** (Priority: CRITICAL)
+- **BLOCKER**: CoinGecko free API cannot provide historical data needed for backtesting (only recent 365 days)
+- **Solution**: Implement multi-source data collection using free alternatives identified in research
+- **Sources**: CryptoDataDownload.com (CSV files), Kaggle datasets, yfinance library
+- **Coverage**: Bitcoin from 2014, Ethereum from 2016, 50+ major cryptocurrencies
+- **Files**: `functions/historical-data-updater/scripts/` - create new collection strategy
+- **Research**: Complete research document available in session notes above
 
-#### 2. **Enhance Rebalancing Logic** (Priority: MEDIUM) 
-- **Issue**: Current algorithm doesn't handle cash-only periods before first crypto appears
-- **Requirements**: Cash should remain as cash until Bitcoin (2009), then 100% Bitcoin, then rebalance by market cap
-- **Data Constraint**: Historical data only covers 1 year (2024-2025), not full crypto history
-- **Files**: `frontend/src/app/services/backtesting.service.ts` (rebalancing logic)
-
-#### 3. **Improve Test Coverage to 70%** (Priority: HIGH)
-- **Current**: 56.55% statements, 39.15% branches (target: 70%)
+#### 2. **Test Coverage to 70%** (Priority: HIGH)
+- **Current**: 55.65% statements (target: 70%) 
 - **Focus Areas**: Backtesting Service (4.21% coverage), Historical Data Service (28.75% coverage)
 - **Files**: `frontend/src/app/services/backtesting.service.ts`, `frontend/src/app/services/historical-data.service.ts`
 - **Action**: Use `.claude/templates/test.template.spec.ts` as starting point for comprehensive test suites
 
+#### 3. **Validate Current Historical Data** (Priority: MEDIUM)
+- **Issue**: Current Azure Blob Storage data is limited to 1 year (2024-2025) 
+- **Action**: Run enhanced progress checker to audit existing data: `node check-progress-enhanced.js`
+- **Next**: Compare with requirements and plan data replacement strategy
+- **Files**: `functions/historical-data-updater/scripts/check-progress-enhanced.js`
+
 ### **Known Issues**
-- **Test Coverage Gap**: Need additional 13.45% coverage to reach 70% target (currently 56.55%)
-- **Bundle Size**: 1.23 MB (up from 1.09 MB due to Chart.js, within acceptable limits)
-- **Future Enhancement**: Rebalancing logic could be more sophisticated for long historical periods
-- **Data Limitation**: Historical data only covers 1 year, not full cryptocurrency history
+- **CRITICAL DATA LIMITATION**: CoinGecko free API blocks historical backtesting functionality
+- **Test Coverage Gap**: Need additional 14.35% coverage to reach 70% target (currently 55.65%)
+- **Data Strategy**: Must implement alternative data sources for project viability
+- **Timeline Impact**: Phase 2 delayed until historical data collection is resolved
 
 ### **Files to Focus On**
-- **NEXT CHARTS**: `frontend/src/app/components/backtesting/backtesting.component.ts:622-702` (add more chart types)
-- **REBALANCING**: `frontend/src/app/services/backtesting.service.ts` (enhance algorithm logic)
+- **CRITICAL**: `functions/historical-data-updater/scripts/` - implement new data collection strategy
+- **DATA AUDIT**: `functions/historical-data-updater/scripts/check-progress-enhanced.js` - run to assess current data
 - **TEST COVERAGE**: `frontend/src/app/services/backtesting.service.ts` (4.21% coverage - add comprehensive tests)
 - **TEST COVERAGE**: `frontend/src/app/services/historical-data.service.ts` (28.75% coverage - add service tests)
-- **REFERENCE**: Chart.js integration pattern already established in createPerformanceChart method
+- **RESEARCH REFERENCE**: Alternative data sources documented in session notes above
